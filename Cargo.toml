@@ -1,0 +1,10 @@
+[package]
+name = "bank-converter"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[[example]]
+name = "cli"
+path = "src/examples/cli.rs"
