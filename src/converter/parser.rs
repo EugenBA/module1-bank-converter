@@ -22,7 +22,27 @@ struct StatementAttribute{
     cred_dt_tm: String, //CreDtTm
     fr_to_dt: FromToDtAttribute, //FrToDt
     acct: AccAttribute, //Acct
+    bal: Vec<BalanceAttribute>
 
+}
+
+struct BalanceAttribute{
+    tp: TpBalanceAttribute, // tp
+    amt: f64,
+    ccy: String,
+    dt:  DtAttribute
+}
+
+struct DtAttribute{
+    dt: String,
+}
+
+struct TpBalanceAttribute{
+    cd_or_party: CdAttribute
+}
+
+struct CdAttribute{
+    cd: String,
 }
 
 struct FromToDtAttribute{
@@ -31,12 +51,16 @@ struct FromToDtAttribute{
 }
 
 struct AccAttribute{
-    id_iban: String, //id/IBAN
+    id: IdIbanAttribute, //id
     ccy: String, //Ccy
     nm: String, //nm
     ownr: OwnerAttribute, //ownr
     svcr: SvcrAttribute, //svcr
 
+}
+
+struct IdIbanAttribute{
+    iban: String, //IBAN
 }
 
 struct SvcrAttribute{
