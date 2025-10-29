@@ -5,16 +5,17 @@ use thiserror::Error;
 enum CommandArgsError
 {
     BadArgument(String),
-    BadFormatType(String)
+
 }
 
 
 #[derive(Error, Debug)]
-enum ParserError
+pub enum ParserError
 {
     FileReadError(String),
     BadInputFormatFile(String),
-    FileWriteError(String)
+    FileWriteError(String),
+    BadFormatType(String)
 }
 
 impl Display for ParserError {
@@ -23,6 +24,7 @@ impl Display for ParserError {
             ParserError::FileReadError(s) => write!(f, "File read error: {}", s),
             ParserError::BadInputFormatFile(s) => write!(f, "Bad input format file: {}", s),
             ParserError::FileWriteError(s) => write!(f, "File write error: {}", s),
+            ParserError::BadFormatType(s) => write!(f, "Bad format type: {}", s),
         }
     }
 }
@@ -31,7 +33,6 @@ impl Display for CommandArgsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             CommandArgsError::BadArgument(s) => write!(f, "Bad argument: {}", s),
-            CommandArgsError::BadFormatType(s) => write!(f, "Bad format type: {}", s),
         }
     }
 }
