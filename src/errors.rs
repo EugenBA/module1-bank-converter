@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter};
+use serde::Deserialize;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -9,7 +10,7 @@ enum CommandArgsError
 }
 
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Deserialize)]
 pub enum ParserError
 {
     FileReadError(String),
@@ -26,6 +27,12 @@ impl Display for ParserError {
             ParserError::FileWriteError(s) => write!(f, "File write error: {}", s),
             ParserError::BadFormatType(s) => write!(f, "Bad format type: {}", s),
         }
+    }
+}
+
+impl  From<serde_xml_rs::Error> for ParserError{
+    fn from(err: serde_xml_rs::Error) -> Self{
+        ParserError::BadFormatType(err.to_string())
     }
 }
 

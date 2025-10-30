@@ -1,5 +1,5 @@
 use std::env;
-use bank_converter::converter::reader::{PipelineParse};
+use bank_converter::converter::parser::{PipelineParse};
 
 fn main() {
     // Получаем аргументы командной строки

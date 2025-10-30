@@ -1,32 +1,60 @@
+use std::io::{BufRead, BufReader, Stdin, Stdout};
 use crate::converter::parser::FormatType;
-pub struct PipelineParse {
-    pub data_in: InOutData,
-    pub data_out: InOutData
+use crate::errors::ParserError;
+use crate::models::camt053::Document;
+
+
+
+pub struct InputDataType {
+    format_type: FormatType,
+    buff_read: Stdin,
 }
 
-pub struct InOutData{
-    pub file_name: String,
-    pub format_type: FormatType
+pub struct OutDataType {
+    format_type: FormatType,
+    buff_read: Stdout,
 }
 
-impl PipelineParse {
-    pub fn get_format_type_from_string(format_str: &String) -> FormatType{
-        match format_str.to_lowercase().as_str() {
-            "csv" => FormatType::Csv,
-            "xml" => FormatType::Xml,
-            "mt940" => FormatType::Mt940,
-            "camt053" => FormatType::Camt053,
-            _=> FormatType::None
+
+impl TryFrom<InputDataType> for Document {
+    type Error = ParserError;
+    fn try_from(value: InputDataType) -> Result<Self, ParserError> {
+        match value.format_type {
+            FormatType::Camt053 | FormatType::Xml =>{ Document::from_camt053(value.buff_read)},
+            FormatType::Mt940 => { Document::from_mt940(value.buff_read)},
+            FormatType::Csv => { Document::from_csv(value.buff_read)
+            },
+            _ => { Err(ParserError::BadInputFormatFile("Bad input type file".to_string()))}
         }
     }
 }
-impl Default for InOutData {
-    fn default() -> InOutData {
-        InOutData{ file_name: "".to_string(), format_type: FormatType::None }
+
+impl Document {
+    pub fn new() -> Self {
+        Document::default()
     }
-}
-impl Default for PipelineParse {
-    fn default() -> Self {
-        PipelineParse { data_in: InOutData::default(), data_out: InOutData::default() }
+    pub(crate) fn default() -> Self {
+        todo!()
     }
+
+    fn from_csv(buf_reader: Stdin) -> Result<Self, ParserError>{
+        Err(ParserError::BadInputFormatFile("Bad input format file".to_string()))
+    }
+    fn from_camt053(buff_read: Stdin) -> Result<Self, ParserError> {
+        let mut reader = buff_read.lock();
+        let mut xml_str = String::new();
+        while let Ok(byte_reader) = reader.read_line(&mut xml_str) {
+            if byte_reader == 0 {
+                break;
+            }
+        }
+        serde_xml_rs::from_str(&xml_str)?
+    }
+
+
+
+    fn from_mt940(buf_reader: Stdin) -> Result<Self, ParserError> {
+        Err(ParserError::BadInputFormatFile("Bad input format file".to_string()))
+    }
+
 }

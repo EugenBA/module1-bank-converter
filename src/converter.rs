@@ -1,3 +1,3 @@
-mod parser;
-pub mod reader;
-pub mod writer;
+pub mod parser;
+mod reader;
+mod writer;
