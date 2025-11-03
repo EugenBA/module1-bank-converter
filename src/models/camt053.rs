@@ -3,17 +3,19 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct Document{
+pub struct DocumentCamt053 {
     #[serde(rename="@xlmns")]
     xlmns: String,
-    bk_to_cstm: BkToCstmAttribute
+    bk_to_cstm: Vec<BkToCstmAttribute>
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct BkToCstmAttribute{
+pub(crate) struct BkToCstmAttribute{
     grp_hdr: HeaderAttribute,
     stmt: StatementAttribute,
+    #[serde(skip_serializing)]
+    forward_st_line: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
