@@ -6,6 +6,10 @@ use serde::{Deserialize, Serialize};
 pub struct DocumentCamt053 {
     #[serde(rename="@xlmns")]
     xlmns: String,
+    #[serde(rename="@xlmns:xsi")]
+    xmlns_xsi: String,
+    #[serde(rename="@xsi:schemaLocation")]
+    xsi_schema_location: String,
     bk_to_cstm: Vec<BkToCstmAttribute>
 }
 
@@ -260,4 +264,15 @@ struct ShemeNumberAttribute{
 struct PostalAddressAttribute{
     strt_nm: String, //strt_nm
 
+}
+
+impl DocumentCamt053 {
+    pub(crate) fn default() -> Self {
+        DocumentCamt053 {
+            xlmns: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02".to_string(),
+            xmlns_xsi: "http://www.w3.org/2001/XMLSchema-instance".to_string(),
+            xsi_schema_location: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd".to_string(),
+            bk_to_cstm: Vec::new()
+        }
+    }
 }

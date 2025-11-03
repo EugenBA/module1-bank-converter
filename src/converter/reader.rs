@@ -40,10 +40,7 @@ impl DocumentCamt053 {
     pub fn new() -> Self {
         DocumentCamt053::default()
     }
-    pub(crate) fn default() -> Self {
-        todo!()
-    }
-
+    
     fn from_camt053(buff_read: Stdin) -> Result<Self, ParserError> {
         let mut reader = buff_read.lock();
         let mut xml_str = String::new();
