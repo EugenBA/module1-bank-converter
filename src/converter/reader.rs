@@ -13,27 +13,28 @@ pub struct InputDataType {
 }
 
 enum Document{
-    DocumentCamt053{doc: Result<DocumentCamt053, ParserError>},
-    DocumentMt940{doc: Result<DocumentMt940, ParserError>},
-    DocumentCsv{doc: Result<DocumentCsv, ParserError>},
+    DocumentCamt053(Result<DocumentCamt053, ParserError>),
+    DocumentMt940(Result<DocumentMt940, ParserError>),
+    DocumentCsv(Result<DocumentCsv, ParserError>),
+    None(ParserError)
 }
 
 
 
 
-impl TryFrom<InputDataType> for Document {
-    type Error = ParserError;
-    fn try_from(value: InputDataType) -> Result<Self, ParserError> {
+impl From<InputDataType> for Document {
+    fn from(value: InputDataType) -> Self {
         match value.format_type {
-            FormatType::Camt053 | FormatType::Xml =>{
-                Ok(Self::DocumentCamt053 { doc: DocumentCamt053::from_camt053(value.buff_read) })
+            FormatType::Camt053 | FormatType::Xml => {
+                Self::DocumentCamt053(DocumentCamt053::from_camt053(value.buff_read))
             },
-            FormatType::Mt940 => { 
-                Ok(Self::DocumentMt940 {doc:DocumentMt940::from_mt940(value.buff_read)})}
-            FormatType::Csv => { 
-                Ok(Self::DocumentCsv {doc:DocumentCsv::from_csv(value.buff_read)})
+            FormatType::Mt940 => {
+                Self::DocumentMt940(DocumentMt940::from_mt940(value.buff_read))
+            }
+            FormatType::Csv => {
+                Self::DocumentCsv(DocumentCsv::from_csv(value.buff_read))
             },
-            _ => { Err(ParserError::BadInputFormatFile("Bad input type file".to_string()))}
+            _ => { Self::None(ParserError::BadInputFormatFile("Bad input type file".to_string())) }
         }
     }
 }
@@ -45,7 +46,7 @@ impl DocumentCamt053 {
     pub(crate) fn default() -> Self {
         todo!()
     }
-    
+
     fn from_camt053(buff_read: Stdin) -> Result<Self, ParserError> {
         let mut reader = buff_read.lock();
         let mut xml_str = String::new();
