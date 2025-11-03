@@ -19,9 +19,6 @@ enum Document{
     None(ParserError)
 }
 
-
-
-
 impl From<InputDataType> for Document {
     fn from(value: InputDataType) -> Self {
         match value.format_type {

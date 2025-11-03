@@ -6,7 +6,6 @@ use thiserror::Error;
 enum CommandArgsError
 {
     BadArgument(String),
-
 }
 
 
