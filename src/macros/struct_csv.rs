@@ -4,13 +4,13 @@ macro_rules! csv_data {
     ($name: ident, $type:ty, $($field:ident),+) => {
         #[derive(Debug, Deserialize, Serialize)]
         pub struct $name {
-            $($field: $type),+
+            $($field: $type,)+
         }
 
         impl $name {
             pub fn new() -> Self {
-                $name {
-                    $($field: Default::default()),+
+                Self {
+                    $($field: "".to_string()),+
                 }
             }
         }
