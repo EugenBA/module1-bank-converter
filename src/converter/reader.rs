@@ -3,7 +3,8 @@ use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
 use crate::models::camt053::DocumentCamt053;
 use crate::models::mt940::DocumentMt940;
-use crate::models::csv::DocumentCsv;
+use crate::models::csv::{DocumentCsv, RowCsv};
+use csv::Reader;
 
 
 
@@ -41,8 +42,8 @@ impl DocumentCamt053 {
         DocumentCamt053::default()
     }
     
-    fn from_camt053(buff_read: Stdin) -> Result<Self, ParserError> {
-        let mut reader = buff_read.lock();
+    fn from_camt053(buf_read: Stdin) -> Result<Self, ParserError> {
+        let mut reader = buf_read.lock();
         let mut xml_str = String::new();
         while let Ok(byte_reader) = reader.read_line(&mut xml_str) {
             if byte_reader == 0 {
@@ -61,7 +62,14 @@ impl DocumentMt940 {
 }
 
 impl DocumentCsv {
-    fn from_csv(buf_reader: Stdin) -> Result<Self, ParserError> {
-        Err(ParserError::BadInputFormatFile("Bad input format file".to_string()))
+    fn from_csv(buf_read: Stdin) -> Result<Self, ParserError> {
+        let reader = buf_read.lock();
+        let mut csv_document: DocumentCsv = DocumentCsv::new();
+        let mut csv_rdr = Reader::from_reader(reader);
+        for row in csv_rdr.deserialize() {
+            let row_data: RowCsv = row?;
+            csv_document.rows.push(row_data);
+        }
+        Ok(csv_document)
     }
 }
