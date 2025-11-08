@@ -268,11 +268,100 @@ struct PostalAddressAttribute{
 
 impl DocumentCamt053 {
     pub(crate) fn default() -> Self {
-        DocumentCamt053 {
+        Self {
             xlmns: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02".to_string(),
             xmlns_xsi: "http://www.w3.org/2001/XMLSchema-instance".to_string(),
             xsi_schema_location: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd".to_string(),
             bk_to_cstm: Vec::new()
         }
     }
+}
+
+impl BkToCstmAttribute {
+    pub(crate) fn default() -> Self{
+        Self{
+            grp_hdr: HeaderAttribute::default(),
+            stmt: StatementAttribute::default(),
+            forward_st_line: "ForwardStLine".to_string(),
+        }
+    }
+}
+
+impl HeaderAttribute {
+    pub(crate) fn default() -> Self {
+        Self {
+            msg_id: "MsgId".to_string(),
+            crd_dt_tm: "1979-01-01T00:00:00".to_string(),
+        }
+    }
+}
+
+impl StatementAttribute {
+    pub(crate) fn default() -> Self{
+        Self{
+            id: "Id".to_string(),
+            electr_seq_nb: 0,
+            lgl_seq_nv: 0,
+            cred_dt_tm: "CredDtTm".to_string(),
+            fr_to_dt: FromToDtAttribute::default(),
+            acct: AccAttribute::default(),
+            bal: vec![],
+            txs_summry: TxsSummryAttribute::default(),
+            ntry: vec![],
+        }
+    }
+}
+
+impl FromToDtAttribute {
+    pub(crate) fn default() -> Self {
+        Self {
+            fr_dt_tm: "FrDtTm".to_string(),
+            to_dt_tm: "ToDtTm".to_string(),
+        }
+    }
+}
+
+impl TxsSummryAttribute {   
+    pub(crate) fn default() -> Self {
+        Self {
+            ttl_ntries: TtlNtriesAttribute {
+                nb_of_ntries: 0,
+                ttl_net_ntry_amt: 0.0,
+                cdt_dbt_ind: "CdtDbtInd".to_string(),
+            },
+            ttl_cdt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0, sum: 0.0 },
+            ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0, sum: 0.0 },
+        }
+    }
+}
+
+impl AccAttribute {
+    pub(crate) fn default() -> Self{
+        Self{
+            id: IdIbanAttribute { iban: "Iban".to_string() },
+            ccy: "Ccy".to_string(),
+            nm: "Nm".to_string(),
+            ownr: OwnerAttribute::default(),
+            svcr: SvcrAttribute { fin_inst_id: FinInstIdAttribute { bic: "Bic".to_string() } },
+        }
+    }
+}
+
+impl OwnerAttribute {
+    pub(crate) fn default() -> Self {
+        Self {
+            nm: "Nm".to_string(),
+            pstl_addr: PostalAddressAttribute { strt_nm: "StrtNm".to_string() },
+            bldg_nb: 0,
+            pst_cd: 0,
+            twn_nm: "TwnNm".to_string(),
+            ctry: "Ctry".to_string(),
+            id: IdAttribute { org_id: OrgIdAttribute { 
+                othr: OtherAttribute { 
+                    id: "Id".to_string(), 
+                    schme_nm: ShemeNumberAttribute { 
+                        cd: "Cd".to_string() } } } },
+        }
+    }
+    
 }

@@ -1,12 +1,10 @@
 use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
-use crate::models::camt053::DocumentCamt053;
-use crate::models::mt940::DocumentMt940;
+use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053};
+use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
-
-
 
 pub struct InputDataType {
     format_type: FormatType,
@@ -56,8 +54,43 @@ impl DocumentCamt053 {
 }
 
 impl DocumentMt940 {
-    fn from_mt940(buf_reader: Stdin) -> Result<Self, ParserError> {
-        Err(ParserError::BadInputFormatFile("Bad input format file".to_string()))
+
+    fn find_record(document: &str) -> Option<Vec<(usize, usize)>> {
+        let mut vec_start_pattern: Vec<usize> = Vec::new();
+        let mut vec_end_pattern: Vec<usize> = Vec::new();
+        let mut records: Vec<(usize, usize)> = Vec::new();
+        for (index, found_pattern) in document.match_indices("{1"){
+            vec_start_pattern.push(index);
+        }
+        for (index, found_pattern) in document.match_indices("{5:"){
+            vec_end_pattern.push(index);
+        }
+        for i in vec_start_pattern.iter().enumerate(){
+            records.push((vec_start_pattern[i.0], vec_end_pattern[i.0]));
+        }
+        Some(records)
+    }
+
+    fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
+        let mut record: BkToCstmAttribute = BkToCstmAttribute::default();
+        None
+    }
+
+    fn from_mt940(buf_read: Stdin) -> Result<Self, ParserError> {
+        let mut regex_pattern = String::new();
+        match DocumentMt940::find_record(&regex_pattern) {
+            Some(records) => {
+                let mut document = DocumentMt940::default();
+                for record in records {
+
+                }
+            }
+            _ => {
+               return Err(ParserError::BadInputFormatFile("No \
+               find start or end patter in file".to_string()));
+            }
+        }
+        Err(ParserError::BadInputFormatFile("No implement parse document".to_string()))
     }
 }
 
