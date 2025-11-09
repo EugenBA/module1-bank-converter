@@ -5,6 +5,7 @@ use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
+use regex::{Error, Regex};
 
 pub struct InputDataType {
     format_type: FormatType,
@@ -73,21 +74,34 @@ impl DocumentMt940 {
 
     fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
         let mut record: BkToCstmAttribute = BkToCstmAttribute::default();
+        for field in 1..6 {
+            let reg_pattern = Regex::new(&format!("{{{}:[\\n\\w\\d ,/:-]*}}",
+                                                  field));
+            if let Ok(regexp) = reg_pattern {
+                match regexp.captures(document) {
+                    Some(capture) => {
+                        match field {
+                            1 => {},
+                            2 => {},
+                            3 => {},
+                            4 => {},
+                            5 => {},
+                            _ => {}
+                        }
+                      //  record.set_field(field, capture.get(0).unwrap().as_str());
+                    }
+                    None => {}
+                }
+            }
+        }
         None
     }
 
     fn from_mt940(buf_read: Stdin) -> Result<Self, ParserError> {
         let mut regex_pattern = String::new();
-        match DocumentMt940::find_record(&regex_pattern) {
-            Some(records) => {
-                let mut document = DocumentMt940::default();
-                for record in records {
-
-                }
-            }
-            _ => {
-               return Err(ParserError::BadInputFormatFile("No \
-               find start or end patter in file".to_string()));
+        if let Some(records) = DocumentMt940::find_record(&regex_pattern) {
+            for record in records {
+                DocumentMt940::parse_one_record(&regex_pattern[record.0..record.1]);
             }
         }
         Err(ParserError::BadInputFormatFile("No implement parse document".to_string()))
