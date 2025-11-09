@@ -5,7 +5,7 @@ use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
-use regex::{Error, Regex};
+use regex::{Regex};
 
 pub struct InputDataType {
     format_type: FormatType,
@@ -72,16 +72,27 @@ impl DocumentMt940 {
         Some(records)
     }
 
+    fn parse_header_one(header: &str) -> String{
+        let regex = Regex::new(r"F\d{2}([A-Z]*\d*[A-Z]*)\d").unwrap();
+        if let Some(capture) = regex.captures(header) {
+            capture[1].to_string()
+        }
+        else {
+            "UNKNOW_BIC".to_string()
+        }
+    }
+
     fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
         let mut record: BkToCstmAttribute = BkToCstmAttribute::default();
         for field in 1..6 {
-            let reg_pattern = Regex::new(&format!("{{{}:[\\n\\w\\d ,/:-]*}}",
+            let reg_pattern = Regex::new(&format!(r"\{{{}:[\n\w\d ,/:-]*\}}",
                                                   field));
             if let Ok(regexp) = reg_pattern {
                 match regexp.captures(document) {
                     Some(capture) => {
                         match field {
-                            1 => {},
+                            1 => { record.stmt.acct.svcr.fin_inst_id.bic =
+                                DocumentMt940::parse_header_one(&capture[1].to_string());},
                             2 => {},
                             3 => {},
                             4 => {},

@@ -17,7 +17,7 @@ pub struct DocumentCamt053 {
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct BkToCstmAttribute{
     grp_hdr: HeaderAttribute,
-    stmt: StatementAttribute,
+    pub(crate) stmt: StatementAttribute,
     #[serde(skip_serializing)]
     forward_st_line: String
 }
@@ -31,13 +31,13 @@ struct HeaderAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct StatementAttribute{
+pub(crate)  struct StatementAttribute{
     id: String, //id
     electr_seq_nb: u32, //ElctrncSeqNb
     lgl_seq_nv: u32, //LglSeqNb
     cred_dt_tm: String, //CreDtTm
     fr_to_dt: FromToDtAttribute, //FrToDt
-    acct: AccAttribute, //Acct
+    pub(crate) acct: AccAttribute, //Acct
     bal: Vec<BalanceAttribute>, //Bal
     txs_summry: TxsSummryAttribute, //TxsSummry
     ntry: Vec<NtryAttribute> //Ntry
@@ -201,13 +201,13 @@ struct FromToDtAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct AccAttribute{
+pub(crate)  struct AccAttribute{
     id: IdIbanAttribute, //id
     #[serde(rename="@Ccy")]
     ccy: String, //Ccy
     nm: String, //nm
     ownr: OwnerAttribute, //ownr
-    svcr: SvcrAttribute, //svcr
+    pub(crate) svcr: SvcrAttribute, //svcr
 
 
 }
@@ -218,13 +218,13 @@ struct IdIbanAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct SvcrAttribute{
-    fin_inst_id: FinInstIdAttribute //FinInstnId
+pub(crate)  struct SvcrAttribute{
+    pub(crate) fin_inst_id: FinInstIdAttribute //FinInstnId
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct FinInstIdAttribute{
-    bic: String, //BIC
+pub(crate)  struct FinInstIdAttribute{
+    pub(crate) bic: String, //BIC
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
