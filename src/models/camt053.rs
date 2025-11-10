@@ -16,7 +16,7 @@ pub struct DocumentCamt053 {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct BkToCstmAttribute{
-    grp_hdr: HeaderAttribute,
+    pub(crate) grp_hdr: HeaderAttribute,
     pub(crate) stmt: StatementAttribute,
     #[serde(skip_serializing)]
     forward_st_line: String
@@ -24,15 +24,15 @@ pub(crate) struct BkToCstmAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct HeaderAttribute{
-    msg_id: String, //message id
+pub(crate) struct HeaderAttribute{
+    pub(crate) msg_id: String, //message id
     crd_dt_tm: String, //datetime create file
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate)  struct StatementAttribute{
-    id: String, //id
+    pub(crate) id: String, //id
     electr_seq_nb: u32, //ElctrncSeqNb
     lgl_seq_nv: u32, //LglSeqNb
     cred_dt_tm: String, //CreDtTm

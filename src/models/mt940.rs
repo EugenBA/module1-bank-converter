@@ -12,10 +12,22 @@ impl DocumentMt940 {
     
 }
 
-pub enum DocumentMt940Field {
-    One(String),
-    Two(String),
-    Fri(String),
-    Fo(String),
-    Five(String)
+pub(crate) enum DocumentMt940H2Direction{
+    Input,
+    Output,
+    UNKNOW
+}
+
+pub(crate) struct DocumentMt940H2{
+    pub(crate) direction: DocumentMt940H2Direction,
+    pub(crate) reference: String
+}
+
+impl DocumentMt940H2{
+    pub(crate) fn default() -> Self{
+        Self{
+            direction: DocumentMt940H2Direction::UNKNOW,
+            reference: "UNKNOWN_REFERENCE".to_string(),
+        }
+    }
 }

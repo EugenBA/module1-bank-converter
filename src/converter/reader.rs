@@ -2,7 +2,7 @@ use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
 use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053};
-use crate::models::mt940::{DocumentMt940};
+use crate::models::mt940::{DocumentMt940, DocumentMt940H2, DocumentMt940H2Direction};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
 use regex::{Regex};
@@ -60,10 +60,10 @@ impl DocumentMt940 {
         let mut vec_start_pattern: Vec<usize> = Vec::new();
         let mut vec_end_pattern: Vec<usize> = Vec::new();
         let mut records: Vec<(usize, usize)> = Vec::new();
-        for (index, found_pattern) in document.match_indices("{1"){
+        for (index, _found_pattern) in document.match_indices("{1"){
             vec_start_pattern.push(index);
         }
-        for (index, found_pattern) in document.match_indices("{5:"){
+        for (index, _found_pattern) in document.match_indices("{5:"){
             vec_end_pattern.push(index);
         }
         for i in vec_start_pattern.iter().enumerate(){
@@ -82,6 +82,20 @@ impl DocumentMt940 {
         }
     }
 
+    fn parse_header_two(header: &str) -> DocumentMt940H2{
+        let mut header2 = DocumentMt940H2::default();
+        let regex = Regex::new(r"([IO])(\d{3})(.*?)").unwrap();
+        if let Some(capture) = regex.captures(header) {
+            match capture[1].as_ref(){
+                "I" => { header2.direction =  DocumentMt940H2Direction::Input},
+                "O" => { header2.direction = DocumentMt940H2Direction::Output},
+                _ => {header2.direction = DocumentMt940H2Direction::UNKNOW}
+            }
+            header2.reference = capture[2].to_string();
+        }
+        header2
+    }
+
     fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
         let mut record: BkToCstmAttribute = BkToCstmAttribute::default();
         for field in 1..6 {
@@ -93,7 +107,11 @@ impl DocumentMt940 {
                         match field {
                             1 => { record.stmt.acct.svcr.fin_inst_id.bic =
                                 DocumentMt940::parse_header_one(&capture[1].to_string());},
-                            2 => {},
+                            2 => {
+                                let header_two = DocumentMt940::parse_header_two(&capture[1].to_string());
+                                record.grp_hdr.msg_id = header_two.reference;
+                                record.stmt.id = record.grp_hdr.msg_id  + "-940";
+                            },
                             3 => {},
                             4 => {},
                             5 => {},
