@@ -72,7 +72,7 @@ impl DocumentMt940 {
         Some(records)
     }
 
-    fn parse_header_one(header: &str) -> String{
+    fn parse_field_one(header: &str) -> String{
         let regex = Regex::new(r"F\d{2}([A-Z]*\d*[A-Z]*)\d").unwrap();
         if let Some(capture) = regex.captures(header) {
             capture[1].to_string()
@@ -82,7 +82,7 @@ impl DocumentMt940 {
         }
     }
 
-    fn parse_header_two(header: &str) -> DocumentMt940H2{
+    fn parse_field_two(header: &str) -> DocumentMt940H2{
         let mut header2 = DocumentMt940H2::default();
         let regex = Regex::new(r"([IO])(\d{3})(.*?)").unwrap();
         if let Some(capture) = regex.captures(header) {
@@ -96,6 +96,11 @@ impl DocumentMt940 {
         header2
     }
 
+    fn parse_field_foo(header: &str) -> String{
+
+        "no impliment".to_string()
+    }
+
     fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
         let mut record: BkToCstmAttribute = BkToCstmAttribute::default();
         for field in 1..6 {
@@ -106,9 +111,9 @@ impl DocumentMt940 {
                     Some(capture) => {
                         match field {
                             1 => { record.stmt.acct.svcr.fin_inst_id.bic =
-                                DocumentMt940::parse_header_one(&capture[1].to_string());},
+                                DocumentMt940::parse_field_one(&capture[1].to_string());},
                             2 => {
-                                let header_two = DocumentMt940::parse_header_two(&capture[1].to_string());
+                                let header_two = DocumentMt940::parse_field_two(&capture[1].to_string());
                                 record.grp_hdr.msg_id = header_two.reference;
                                 record.stmt.id = record.grp_hdr.msg_id  + "-940";
                             },
