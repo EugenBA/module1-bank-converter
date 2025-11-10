@@ -33,8 +33,8 @@ pub(crate) struct HeaderAttribute{
 #[serde(rename_all = "PascalCase")]
 pub(crate)  struct StatementAttribute{
     pub(crate) id: String, //id
-    electr_seq_nb: u32, //ElctrncSeqNb
-    lgl_seq_nv: u32, //LglSeqNb
+    pub(crate)  electr_seq_nb: String, //ElctrncSeqNb
+    pub(crate) lgl_seq_nv: String, //LglSeqNb
     cred_dt_tm: String, //CreDtTm
     fr_to_dt: FromToDtAttribute, //FrToDt
     pub(crate) acct: AccAttribute, //Acct
@@ -206,7 +206,7 @@ pub(crate)  struct AccAttribute{
     #[serde(rename="@Ccy")]
     ccy: String, //Ccy
     nm: String, //nm
-    ownr: OwnerAttribute, //ownr
+    pub(crate) ownr: OwnerAttribute, //ownr
     pub(crate) svcr: SvcrAttribute, //svcr
 
 
@@ -228,30 +228,30 @@ pub(crate)  struct FinInstIdAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct OwnerAttribute{
+pub(crate) struct OwnerAttribute{
     nm: String, //nm
     pstl_addr: PostalAddressAttribute, //pstl_addr
     bldg_nb: u32, //BldgNb
     pst_cd: u32, //PstCd
     twn_nm: String, //TwnNm
     ctry: String, //Ctry
-    id: IdAttribute, //Id
+    pub(crate) id: IdAttribute, //Id
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct IdAttribute{
-    org_id: OrgIdAttribute//OrgId
+pub(crate) struct IdAttribute{
+    pub(crate) org_id: OrgIdAttribute//OrgId
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct OrgIdAttribute{
-    othr: OtherAttribute //Othr
+pub(crate) struct OrgIdAttribute{
+    pub(crate) othr: OtherAttribute //Othr
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct OtherAttribute{
-    id: String, //id
+pub(crate) struct OtherAttribute{
+    pub(crate) id: String, //id
     schme_nm: ShemeNumberAttribute //SchmeNm
 }
 #[derive(Debug, Deserialize, Serialize)]
@@ -300,8 +300,8 @@ impl StatementAttribute {
     pub(crate) fn default() -> Self{
         Self{
             id: "Id".to_string(),
-            electr_seq_nb: 0,
-            lgl_seq_nv: 0,
+            electr_seq_nb: "0".to_string(),
+            lgl_seq_nv: "0".to_string(),
             cred_dt_tm: "CredDtTm".to_string(),
             fr_to_dt: FromToDtAttribute::default(),
             acct: AccAttribute::default(),

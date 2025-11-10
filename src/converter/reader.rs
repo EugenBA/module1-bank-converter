@@ -86,13 +86,42 @@ impl DocumentMt940 {
         let regex = Regex::new(r"([IO])(\d{3})(.*?)").unwrap();
         if let Some(capture) = regex.captures(header) {
             document.grp_hdr.msg_id  = capture[2].to_string();
-            document.stmt.id = document.grp_hdr.msg_id.clone() + "-940";
+            document.stmt.id = capture[2].to_string()+ "-940";
         }
     }
 
-    fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) -> String{
-
-        "no impliment".to_string()
+    fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) {
+        let reg_codes = ["20", "25", "28C", "60F", "61", "62F", "64", "86"];
+        for reg_code in reg_codes.iter() {
+            let reg_pattern = Regex::new(&format!(r":{}:([\n\w\d ,/-]+):",
+                                                  reg_code));
+            if let Ok(regexp) = reg_pattern{
+                if let Some(capture) = regexp.captures(header){
+                    match reg_code.as_ref() {
+                        "26" => {
+                            document.grp_hdr.msg_id = capture[1].to_string();
+                            document.stmt.id = capture[1].to_string();
+                        },
+                        "25" => {
+                            document.stmt.acct.ownr.id.org_id.othr.id = capture[1].to_string();
+                        },
+                        "28C" => {
+                            let fields: Vec<&str> = capture[1].split('/').collect();
+                            if fields.len() > 1{
+                                document.stmt.electr_seq_nb = fields[0].to_string();
+                                document.stmt.lgl_seq_nv = fields[1].to_string();
+                            }
+                        },
+                        "60F" => {},
+                        "61" => {},
+                        "62F" => {},
+                        "64" => {},
+                        "86" => {},
+                        _=>{}
+                    }
+                }
+            }
+        }
     }
 
     fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
