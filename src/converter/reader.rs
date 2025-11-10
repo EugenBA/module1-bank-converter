@@ -2,7 +2,7 @@ use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
 use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053};
-use crate::models::mt940::{DocumentMt940, DocumentMt940H2, DocumentMt940H2Direction};
+use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
 use regex::{Regex};
@@ -82,21 +82,15 @@ impl DocumentMt940 {
         }
     }
 
-    fn parse_field_two(header: &str) -> DocumentMt940H2{
-        let mut header2 = DocumentMt940H2::default();
+    fn parse_field_two(header: &str, document: &mut BkToCstmAttribute) {
         let regex = Regex::new(r"([IO])(\d{3})(.*?)").unwrap();
         if let Some(capture) = regex.captures(header) {
-            match capture[1].as_ref(){
-                "I" => { header2.direction =  DocumentMt940H2Direction::Input},
-                "O" => { header2.direction = DocumentMt940H2Direction::Output},
-                _ => {header2.direction = DocumentMt940H2Direction::UNKNOW}
-            }
-            header2.reference = capture[2].to_string();
+            document.grp_hdr.msg_id  = capture[2].to_string();
+            document.stmt.id = document.grp_hdr.msg_id.clone() + "-940";
         }
-        header2
     }
 
-    fn parse_field_foo(header: &str) -> String{
+    fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) -> String{
 
         "no impliment".to_string()
     }
@@ -113,22 +107,18 @@ impl DocumentMt940 {
                             1 => { record.stmt.acct.svcr.fin_inst_id.bic =
                                 DocumentMt940::parse_field_one(&capture[1].to_string());},
                             2 => {
-                                let header_two = DocumentMt940::parse_field_two(&capture[1].to_string());
-                                record.grp_hdr.msg_id = header_two.reference;
-                                record.stmt.id = record.grp_hdr.msg_id  + "-940";
+                                DocumentMt940::parse_field_two(&capture[1].to_string(), &mut record);
                             },
-                            3 => {},
-                            4 => {},
-                            5 => {},
+                            4 => { DocumentMt940::parse_field_foo(&capture[1].to_string(),
+                                                                  &mut record); },
                             _ => {}
                         }
-                      //  record.set_field(field, capture.get(0).unwrap().as_str());
                     }
                     None => {}
                 }
             }
         }
-        None
+        Some(record)
     }
 
     fn from_mt940(buf_read: Stdin) -> Result<Self, ParserError> {
