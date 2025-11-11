@@ -1,11 +1,12 @@
 use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
-use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053};
+use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
 use regex::{Regex};
+
 
 pub struct InputDataType {
     format_type: FormatType,
@@ -83,15 +84,32 @@ impl DocumentMt940 {
     }
 
     fn parse_field_two(header: &str, document: &mut BkToCstmAttribute) {
-        let regex = Regex::new(r"([IO])(\d{3})(.*?)").unwrap();
-        if let Some(capture) = regex.captures(header) {
-            document.grp_hdr.msg_id  = capture[2].to_string();
-            document.stmt.id = capture[2].to_string()+ "-940";
+        let regex = Regex::new(r"([IO])(\d{3})(.*?)");
+        if let Ok(regex) = regex {
+            if let Some(capture) = regex.captures(header) {
+                document.grp_hdr.msg_id = capture[2].to_string();
+                document.stmt.id = capture[2].to_string() + "-940";
+            }
         }
     }
 
+    fn parse_field_balance(header: &str) -> Option<BalanceAttribute>{
+        let regex = Regex::new(r"C(\d{2})(\d{2})(\d{2})([A-Z]+)(\d+,\d+)");
+        if let Ok(regex) = regex {
+            if let Some(capture) = regex.captures(header) {
+                let mut balance = BalanceAttribute::default();
+                balance.dt.dt = format!("20{}-{}-{}", capture[3].to_string(),
+                                        capture[2].to_string(), capture[1].to_string());
+                balance.ccy = capture[4].to_string();
+                balance.amt = capture[5].replace(",", ".").to_string();
+                return Some(balance);
+            }
+        }
+        None
+    }
+
     fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) {
-        let reg_codes = ["20", "25", "28C", "60F", "61", "62F", "64", "86"];
+        let reg_codes = ["20", "25", "28C", "60F", "61", "62F", "62M", "64", "86"];
         for reg_code in reg_codes.iter() {
             let reg_pattern = Regex::new(&format!(r":{}:([\n\w\d ,/-]+):",
                                                   reg_code));
@@ -112,9 +130,20 @@ impl DocumentMt940 {
                                 document.stmt.lgl_seq_nv = fields[1].to_string();
                             }
                         },
-                        "60F" => {},
+                        "60F" => {
+                            if  let Some(mut balance) = DocumentMt940::parse_field_balance(&capture[1]){
+                                balance.tp.cd_or_party.cd = "OPBD".to_string();
+                                document.stmt.bal.push(balance);
+                            }
+                        },
                         "61" => {},
-                        "62F" => {},
+                        "62F" => {
+                            if  let Some(mut balance) = DocumentMt940::parse_field_balance(&capture[1]){
+                                balance.tp.cd_or_party.cd = "CLBD".to_string();
+                                document.stmt.bal.push(balance);
+                            }
+                        },
+                        "62M" =>{},
                         "64" => {},
                         "86" => {},
                         _=>{}

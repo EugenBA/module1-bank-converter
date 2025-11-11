@@ -38,7 +38,7 @@ pub(crate)  struct StatementAttribute{
     cred_dt_tm: String, //CreDtTm
     fr_to_dt: FromToDtAttribute, //FrToDt
     pub(crate) acct: AccAttribute, //Acct
-    bal: Vec<BalanceAttribute>, //Bal
+    pub(crate) bal: Vec<BalanceAttribute>, //Bal
     txs_summry: TxsSummryAttribute, //TxsSummry
     ntry: Vec<NtryAttribute> //Ntry
 
@@ -171,27 +171,27 @@ struct TtlCdtDbtNtriesAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct BalanceAttribute{
-    tp: TpBalanceAttribute, // tp
-    amt: f64,
+pub(crate) struct BalanceAttribute{
+    pub(crate) tp: TpBalanceAttribute, // tp
+    pub(crate) amt: String,
     #[serde(rename="@Ccy")]
-    ccy: String,
-    dt:  DtAttribute
+    pub(crate) ccy: String,
+    pub(crate) dt:  DtAttribute
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct DtAttribute{
-    dt: String,
+pub(crate) struct DtAttribute{
+    pub(crate) dt: String,
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct TpBalanceAttribute{
-    cd_or_party: CdAttribute
+pub(crate) struct TpBalanceAttribute{
+    pub(crate) cd_or_party: CdAttribute
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct CdAttribute{
-    cd: String,
+pub(crate) struct CdAttribute{
+    pub(crate) cd: String,
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
@@ -364,4 +364,16 @@ impl OwnerAttribute {
         }
     }
     
+}
+
+impl BalanceAttribute {
+    pub(crate) fn default() -> Self{
+        Self{
+            tp: TpBalanceAttribute { cd_or_party: CdAttribute { cd: "Cd".to_string() } },
+            amt: "".to_string(),
+            ccy: "Ccy".to_string(),
+            dt: DtAttribute { dt: "DT".to_string() },
+        }
+    }
+
 }
