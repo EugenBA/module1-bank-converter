@@ -1,7 +1,7 @@
 use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
-use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053};
+use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053, NtryAttribute};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
@@ -108,8 +108,14 @@ impl DocumentMt940 {
         None
     }
 
+    fn parse_field_61_84(header: &str) -> Option<Vec<NtryAttribute>>{
+        let reg_pattern = Regex::new(r":61:([\n\w\d ,/-]+):");
+        None
+
+    }
+
     fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) {
-        let reg_codes = ["20", "25", "28C", "60F", "61", "62F", "62M", "64", "86"];
+        let reg_codes = ["26", "25", "28C", "60F", "62F", "62M", "64", "65"];
         for reg_code in reg_codes.iter() {
             let reg_pattern = Regex::new(&format!(r":{}:([\n\w\d ,/-]+):",
                                                   reg_code));
@@ -150,8 +156,6 @@ impl DocumentMt940 {
                                 document.stmt.bal.push(balance);
                             }
                         },
-                        "61" => {},
-                        "86" => {},
                         _=>{}
                     }
                 }

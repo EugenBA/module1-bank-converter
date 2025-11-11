@@ -40,13 +40,13 @@ pub(crate)  struct StatementAttribute{
     pub(crate) acct: AccAttribute, //Acct
     pub(crate) bal: Vec<BalanceAttribute>, //Bal
     txs_summry: TxsSummryAttribute, //TxsSummry
-    ntry: Vec<NtryAttribute> //Ntry
+    pub(crate) ntry: Vec<NtryAttribute> //Ntry
 
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct NtryAttribute{
+pub (crate) struct NtryAttribute{
     ntry_ref: u32, //NtryRef
     amt: f64, //Amt
     #[serde(rename="@Ccy")]
