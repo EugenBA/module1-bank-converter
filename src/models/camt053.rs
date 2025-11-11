@@ -48,33 +48,33 @@ pub(crate)  struct StatementAttribute{
 #[serde(rename_all = "PascalCase")]
 pub (crate) struct NtryAttribute{
     ntry_ref: u32, //NtryRef
-    amt: f64, //Amt
+    pub(crate) amt: String, //Amt
     #[serde(rename="@Ccy")]
     ccy: String, //Ccy
-    cdt_dbt_ind: String, //CdtDbtInd
+    pub(crate) cdt_dbt_ind: String, //CdtDbtInd
     sts: String, //Sts
-    book_dt: DtAttribute, //BookgDt
-    val_dt: DtAttribute, //ValDt
+    pub(crate) book_dt: DtAttribute, //BookgDt
+    pub(crate) val_dt: DtAttribute, //ValDt
     acct_svrc_ref: String, //AcctSvcrRef
     bx_tx_cd: BxTxCdAttribute, //BkTxCd
-    ntry_dtls: NtryDtlsAttribute//NtryDtls
+    pub(crate) ntry_dtls: NtryDtlsAttribute//NtryDtls
 
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct NtryDtlsAttribute{
-    btch: BtchAttribute, //Btch
+pub(crate) struct NtryDtlsAttribute{
+    pub(crate) btch: BtchAttribute, //Btch
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct BtchAttribute{
+pub(crate) struct BtchAttribute{
     nb_of_txs: u32, //NbOfTxs
-    tx_dtls: Vec<TxDtlsAttribute>//TxDtls
+   pub(crate) tx_dtls: Vec<TxDtlsAttribute>//TxDtls
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-enum TxDtlsAttribute {
+pub(crate) enum TxDtlsAttribute {
     Refs { end_to_end_id: String },
     AmtDtls { tx_amt: AmtAttribute },
     BxTxCd { partry: CdAttribute },
@@ -376,4 +376,25 @@ impl BalanceAttribute {
         }
     }
 
+}
+impl NtryAttribute {
+    pub(crate) fn default() -> Self{
+        Self{
+            ntry_ref: 0,
+            amt: "Amt".to_string(),
+            ccy: "Ccy".to_string(),
+            cdt_dbt_ind: "CdtDbtInd".to_string(),
+            sts: "Sts".to_string(),
+            book_dt: DtAttribute { dt: "Dt".to_string() },
+            val_dt: DtAttribute { dt: "Dt".to_string() },
+            acct_svrc_ref: "AcctSvrcRef".to_string(),
+            bx_tx_cd: BxTxCdAttribute {
+                domn: DomnAttribute { cd: "Cd".to_string(),
+                    fmly: FmlyAttribute {
+                        cd: "Cd".to_string(),
+                        sub_fmly_cd: "SubFmlyCd".to_string() } },
+                prtry: PrtryAttribute { cd: "Cd".to_string(), issr: "Issr".to_string() } },
+            ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0, tx_dtls: vec![] } },
+        }
+    }
 }

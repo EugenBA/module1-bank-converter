@@ -107,11 +107,58 @@ impl DocumentMt940 {
         }
         None
     }
+    fn parse_field_61(field: &str, ntry: &mut NtryAttribute){
+        let regex = Regex::new(r"(\d{6})(\d{4})([CD])(\d+,\d+)([A-Z]{4})(\w+)");
+        if let Ok(regex) = regex {
+            if let Some(capture) = regex.captures(field) {
+                ntry.val_dt.dt = format!("20{}-{}-{}", capture[1][0 .. 2].to_string(),
+                                        capture[1][2..4].to_string(),
+                                         capture[1][4..6].to_string());
+                ntry.book_dt.dt = format!("20{}-{}-{}", capture[1][0 .. 2].to_string(),
+                                         capture[2][0..2].to_string(),
+                                         capture[2][2..4].to_string());
+                ntry.amt = capture[4].replace(",", ".").to_string();
+                ntry.cdt_dbt_ind  = if capture[3].to_string() == "C".to_string(){
+                    "CRDT".to_string()
+                } else { "DBIT".to_string()};
+                //let mut nxdet = 
+            }
+        }
+    }
+
+    fn parse_field_86(field: &str, ntry: &mut NtryAttribute){
+       //let regex = Regex::new(r":84:([\n\w\d ,/-]+):");
+       // if let Ok(regex) = regex {
+       //     if let Some(capture) = regex.captures(header) {
+        //        ntry.amt = capture[1].to_string();
+        //    }
+        //}
+    }
 
     fn parse_field_61_84(header: &str) -> Option<Vec<NtryAttribute>>{
-        let reg_pattern = Regex::new(r":61:([\n\w\d ,/-]+):");
-        None
-
+        let mut reg_pattern = Regex::new(r":61:([\n\w\d ,/-]+):");
+        let mut field_61: Vec<String> = Vec::new();
+        let mut field_86: Vec<String> = Vec::new();
+        let mut nxtry : Vec<NtryAttribute> = Vec::new();
+        if let Ok(regexp) = reg_pattern {
+            for capture in regexp.captures_iter(header){
+                field_61.push(capture[1].to_string());
+            }
+        }
+        reg_pattern = Regex::new(r":86:([\n\w\d ,/-]+):");
+        if let Ok(regexp) = reg_pattern {
+            for capture in regexp.captures_iter(header){
+                field_86.push(capture[1].to_string());
+            }
+        }
+        let unions: Vec<(String, String)> = field_61.into_iter().zip(field_86.into_iter()).collect();
+        for union in unions.iter(){
+            let mut ntry = NtryAttribute::default();
+            DocumentMt940::parse_field_61(&union.0, &mut ntry);
+            DocumentMt940::parse_field_86(&union.1, &mut ntry);
+            nxtry.push(ntry);
+        }
+        Some(nxtry)
     }
 
     fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) {
@@ -160,6 +207,9 @@ impl DocumentMt940 {
                     }
                 }
             }
+        }
+        if let Some(ntry) = DocumentMt940::parse_field_61_84(&header){
+            document.stmt.ntry = ntry;
         }
     }
 
