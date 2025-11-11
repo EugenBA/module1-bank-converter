@@ -130,21 +130,27 @@ impl DocumentMt940 {
                                 document.stmt.lgl_seq_nv = fields[1].to_string();
                             }
                         },
-                        "60F" => {
+                        "60F" | "62F" | "62M" | "64"  | "65"=> {
                             if  let Some(mut balance) = DocumentMt940::parse_field_balance(&capture[1]){
-                                balance.tp.cd_or_party.cd = "OPBD".to_string();
+                                if *reg_code == "60F" {
+                                    balance.tp.cd_or_party.cd = "OPBD".to_string();
+                                }
+                                if *reg_code == "62F" {
+                                    balance.tp.cd_or_party.cd = "CLBD".to_string();
+                                }
+                                if *reg_code == "62M" {
+                                    balance.tp.cd_or_party.cd = "CLAV".to_string();
+                                }
+                                if *reg_code == "64" {
+                                    balance.tp.cd_or_party.cd = "ITAV".to_string();
+                                }
+                                if *reg_code == "60F" {
+                                    balance.tp.cd_or_party.cd = "FPAV".to_string();
+                                }
                                 document.stmt.bal.push(balance);
                             }
                         },
                         "61" => {},
-                        "62F" => {
-                            if  let Some(mut balance) = DocumentMt940::parse_field_balance(&capture[1]){
-                                balance.tp.cd_or_party.cd = "CLBD".to_string();
-                                document.stmt.bal.push(balance);
-                            }
-                        },
-                        "62M" =>{},
-                        "64" => {},
                         "86" => {},
                         _=>{}
                     }
