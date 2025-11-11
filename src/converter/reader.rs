@@ -171,7 +171,8 @@ impl DocumentMt940 {
                             1 => { record.stmt.acct.svcr.fin_inst_id.bic =
                                 DocumentMt940::parse_field_one(&capture[1].to_string());},
                             2 => {
-                                DocumentMt940::parse_field_two(&capture[1].to_string(), &mut record);
+                                DocumentMt940::parse_field_two(&capture[1].to_string(),
+                                                               &mut record);
                             },
                             4 => { DocumentMt940::parse_field_foo(&capture[1].to_string(),
                                                                   &mut record); },
