@@ -74,13 +74,43 @@ pub(crate) struct BtchAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub(crate) enum TxDtlsAttribute {
-    Refs { end_to_end_id: String },
-    AmtDtls { tx_amt: AmtAttribute },
-    BxTxCd { partry: CdAttribute },
-    RltdPties { cdtr_acct: IdTxDtlsAttribute },
-    RmtInf { strd: CdtrRefInfAttribute },
-    RltdDts { accpt_nc_dt_tm: String }
+pub(crate) struct TxDtlsAttribute {
+    refs: EndToEndIdAttribute, //Refs
+    amt_dtls: TxAmtAttribute, //AmtDtls
+    bx_tx_cd: BxTxCdAttribute, //BxTxCd
+    rltd_pties: RltdPtiesAttribute, //RltdPties
+    rmt_inf: RmtInfAttribute, //RmtInf
+    rltd_dts: RltdDtsAttribute //RltdDts
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct EndToEndIdAttribute{
+    pub(crate) end_to_end_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct TxAmtAttribute{
+    pub(crate) end_to_end_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct RltdPtiesAttribute{
+    pub(crate) cdtr_acct: IdTxDtlsAttribute,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct RmtInfAttribute{
+    pub(crate) strd: CdtrRefInfAttribute,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct RltdDtsAttribute{
+    pub(crate) accpt_nc_dt_tm: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -395,6 +425,19 @@ impl NtryAttribute {
                         sub_fmly_cd: "SubFmlyCd".to_string() } },
                 prtry: PrtryAttribute { cd: "Cd".to_string(), issr: "Issr".to_string() } },
             ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0, tx_dtls: vec![] } },
+        }
+    }
+}
+
+impl DtAttribute {
+    pub(crate) fn format_dt(dt_str: &str) -> Self {
+        Self {
+            dt: if dt_str.len() > 5 {
+                format!("20{}-{}-{}", dt_str[0..2].to_string(),
+                        dt_str[2..4].to_string(), dt_str[4..6].to_string())
+            } else {
+                "1979-01-01".to_string()
+            }
         }
     }
 }

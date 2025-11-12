@@ -1,7 +1,7 @@
 use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
-use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053, NtryAttribute};
+use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053, DtAttribute, NtryAttribute};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
@@ -94,14 +94,13 @@ impl DocumentMt940 {
     }
 
     fn parse_field_balance(header: &str) -> Option<BalanceAttribute>{
-        let regex = Regex::new(r"C(\d{2})(\d{2})(\d{2})([A-Z]+)(\d+,\d+)");
+        let regex = Regex::new(r"C(\d{6})([A-Z]+)(\d+,\d+)");
         if let Ok(regex) = regex {
             if let Some(capture) = regex.captures(header) {
                 let mut balance = BalanceAttribute::default();
-                balance.dt.dt = format!("20{}-{}-{}", capture[3].to_string(),
-                                        capture[2].to_string(), capture[1].to_string());
-                balance.ccy = capture[4].to_string();
-                balance.amt = capture[5].replace(",", ".").to_string();
+                balance.dt= DtAttribute::format_dt(&capture[1]);
+                balance.ccy = capture[2].to_string();
+                balance.amt = capture[3].replace(",", ".").to_string();
                 return Some(balance);
             }
         }
@@ -111,12 +110,9 @@ impl DocumentMt940 {
         let regex = Regex::new(r"(\d{6})(\d{4})([CD])(\d+,\d+)([A-Z]{4})(\w+)");
         if let Ok(regex) = regex {
             if let Some(capture) = regex.captures(field) {
-                ntry.val_dt.dt = format!("20{}-{}-{}", capture[1][0 .. 2].to_string(),
-                                        capture[1][2..4].to_string(),
-                                         capture[1][4..6].to_string());
-                ntry.book_dt.dt = format!("20{}-{}-{}", capture[1][0 .. 2].to_string(),
-                                         capture[2][0..2].to_string(),
-                                         capture[2][2..4].to_string());
+                ntry.val_dt = DtAttribute::format_dt(&capture[1]);
+                let dt =  capture[1][0 .. 2].to_string() + &capture[2][0..4].to_string();
+                ntry.book_dt = DtAttribute::format_dt(&dt);
                 ntry.amt = capture[4].replace(",", ".").to_string();
                 ntry.cdt_dbt_ind  = if capture[3].to_string() == "C".to_string(){
                     "CRDT".to_string()
