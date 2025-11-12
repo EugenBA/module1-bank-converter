@@ -490,8 +490,8 @@ impl NtryDtlsAttribute{
 }
 
 impl TxDtlsAttribute {
-    pub(crate) fn default() -> Self{
-        Self{
+    pub(crate) fn default() -> Self {
+        Self {
             refs: EndToEndIdAttribute { end_to_end_id: "EndToEndId".to_string() },
             amt_dtls: TxAmtAttribute { end_to_end_id: "EndToEndId".to_string(), amt: "amt".to_string() },
             bx_tx_cd: BxTxCdAttribute::default(),
@@ -499,9 +499,13 @@ impl TxDtlsAttribute {
                 cdtr_acct: IdTxDtlsAttribute {
                     id: "Id".to_string(),
                     other: IdDtldAttribute {
-                        id: "Id".to_string() } },
-                dbtr_acct: IdTxDtlsAttribute { id: "id".to_string(), 
-                    other: IdDtldAttribute { id: "id".to_string() } },
+                        id: "Id".to_string()
+                    }
+                },
+                dbtr_acct: IdTxDtlsAttribute {
+                    id: "id".to_string(),
+                    other: IdDtldAttribute { id: "id".to_string() }
+                },
                 cdtr: CdtrAttribue { nm: "nm".to_string() },
                 dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute { id: "id".to_string() } } },
             },
@@ -509,13 +513,16 @@ impl TxDtlsAttribute {
                 strd: CdtrRefInfAttribute {
                     tp: CdOrPrtryAttribute {
                         cd_or_prty: CdAttribute {
-                            cd: "Cd".to_string() } },
-                    ref_cdtr: "RefCdtr".to_string() },
+                            cd: "Cd".to_string()
+                        }
+                    },
+                    ref_cdtr: "RefCdtr".to_string()
+                },
                 ustrd: "ustrd".to_string(),
             },
             rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "AccptNcDtTm".to_string() },
             rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute { bic: "bic".to_string() } },
             addtl_tx_inf: "AddtlTxInf".to_string(),
-        } 
+        }
     }
 }

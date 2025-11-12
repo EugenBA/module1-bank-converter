@@ -3,14 +3,16 @@ use serde::Deserialize;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-enum CommandArgsError
+pub enum ConvertError
 {
     BadArgument(String),
+    ParseError(String),
+    WriteError(String)
 }
 
 
 #[derive(Error, Debug, Deserialize)]
-pub enum ParserError
+pub(crate) enum ParserError
 {
     FileReadError(String),
     BadInputFormatFile(String),
@@ -44,10 +46,12 @@ impl  From<csv::Error> for ParserError {
 }
 
 
-impl Display for CommandArgsError {
+impl Display for ConvertError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            CommandArgsError::BadArgument(s) => write!(f, "Bad argument: {}", s),
+            ConvertError::BadArgument(s) => write!(f, "Bad argument: {}", s),
+            ConvertError::ParseError(s) => write!(f, "Parse error: {}", s),
+            ConvertError::WriteError(s) => write!(f, "Write error: {}", s),
         }
     }
 }
