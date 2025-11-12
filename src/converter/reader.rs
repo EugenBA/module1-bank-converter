@@ -139,35 +139,34 @@ impl DocumentMt940 {
                         tlds.refs.end_to_end_id = capture[2].to_string();
                     },
                     "CRNM" =>{
-
+                        tlds.rltd_pties.cdtr.nm = capture[2].to_string();
                     },
                     "CACT" => {
                         tlds.rltd_pties.cdtr_acct.other.id = capture[2].to_string();
                     },
                     "CBIC" => {
-                       // tlds.
+                        tlds.rltd_agts.cdtr_agt.bic = capture[2].to_string();
                     },
                     "REMI" =>{
-
+                        tlds.rmt_inf.ustrd = capture[2].to_string();
                     },
                     "OPRP" =>{
-
+                        tlds.addtl_tx_inf = capture[2].to_string();
                     },
                     "DACT" =>{
-
+                        tlds.rltd_pties.dbtr_acct.other.id = capture[2].to_string();
                     },
                     "DBIC" =>{
-
+                        tlds.rltd_pties.dbtr_acct.other.id = capture[2].to_string();
                     },
                     "OAMT" =>{
-
+                        tlds.amt_dtls.amt = capture[2].to_string();
                     },
                     "DCID" =>{
-
+                        tlds.rltd_pties.dbtr.id.othr.id = capture[2].to_string();
                     },
                     _ => {}
                 }
-
             }
             ntrydet.btch.tx_dtls.push(tlds);
         }

@@ -76,11 +76,19 @@ pub(crate) struct BtchAttribute{
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct TxDtlsAttribute {
     pub(crate) refs: EndToEndIdAttribute, //Refs
-    amt_dtls: TxAmtAttribute, //AmtDtls
+    pub(crate) amt_dtls: TxAmtAttribute, //AmtDtls
     bx_tx_cd: BxTxCdAttribute, //BxTxCd
     pub(crate) rltd_pties: RltdPtiesAttribute, //RltdPties
-    rmt_inf: RmtInfAttribute, //RmtInf
-    rltd_dts: RltdDtsAttribute //RltdDts
+    pub(crate) rmt_inf: RmtInfAttribute, //RmtInf
+    rltd_dts: RltdDtsAttribute, //RltdDts
+    pub(crate) rltd_agts: CdtrAgtAttribute, //RltdAgts
+    pub(crate) addtl_tx_inf: String, //AddtlTxInf
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct CdtrAgtAttribute{
+    pub(crate) cdtr_agt: FinInstIdAttribute,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -93,18 +101,41 @@ pub(crate) struct EndToEndIdAttribute{
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct TxAmtAttribute{
     pub(crate) end_to_end_id: String,
+    pub(crate) amt: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct RltdPtiesAttribute{
     pub(crate) cdtr_acct: IdTxDtlsAttribute,
+    pub(crate) dbtr_acct: IdTxDtlsAttribute,
+    pub(crate) cdtr: CdtrAttribue,
+    pub(crate) dbtr: DbtrAttribute,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct DbtrAttribute{
+    pub(crate) id: PrvtIdAttribute
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct PrvtIdAttribute {
+    pub(crate) othr: IdDtldAttribute
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct CdtrAttribue{
+    pub(crate) nm: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct RmtInfAttribute{
     pub(crate) strd: CdtrRefInfAttribute,
+    pub(crate) ustrd: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -462,21 +493,29 @@ impl TxDtlsAttribute {
     pub(crate) fn default() -> Self{
         Self{
             refs: EndToEndIdAttribute { end_to_end_id: "EndToEndId".to_string() },
-            amt_dtls: TxAmtAttribute { end_to_end_id: "EndToEndId".to_string() },
+            amt_dtls: TxAmtAttribute { end_to_end_id: "EndToEndId".to_string(), amt: "amt".to_string() },
             bx_tx_cd: BxTxCdAttribute::default(),
             rltd_pties: RltdPtiesAttribute {
                 cdtr_acct: IdTxDtlsAttribute {
                     id: "Id".to_string(),
                     other: IdDtldAttribute {
-                        id: "Id".to_string() } } },
+                        id: "Id".to_string() } },
+                dbtr_acct: IdTxDtlsAttribute { id: "id".to_string(), 
+                    other: IdDtldAttribute { id: "id".to_string() } },
+                cdtr: CdtrAttribue { nm: "nm".to_string() },
+                dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute { id: "id".to_string() } } },
+            },
             rmt_inf: RmtInfAttribute {
                 strd: CdtrRefInfAttribute {
                     tp: CdOrPrtryAttribute {
                         cd_or_prty: CdAttribute {
                             cd: "Cd".to_string() } },
-                    ref_cdtr: "RefCdtr".to_string() } },
+                    ref_cdtr: "RefCdtr".to_string() },
+                ustrd: "ustrd".to_string(),
+            },
             rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "AccptNcDtTm".to_string() },
-        }
-
+            rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute { bic: "bic".to_string() } },
+            addtl_tx_inf: "AddtlTxInf".to_string(),
+        } 
     }
 }
