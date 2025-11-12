@@ -50,7 +50,7 @@ pub (crate) struct NtryAttribute{
     ntry_ref: u32, //NtryRef
     pub(crate) amt: String, //Amt
     #[serde(rename="@Ccy")]
-    ccy: String, //Ccy
+    pub(crate) ccy: String, //Ccy
     pub(crate) cdt_dbt_ind: String, //CdtDbtInd
     sts: String, //Sts
     pub(crate) book_dt: DtAttribute, //BookgDt
@@ -78,7 +78,7 @@ pub(crate) struct TxDtlsAttribute {
     pub(crate) refs: EndToEndIdAttribute, //Refs
     amt_dtls: TxAmtAttribute, //AmtDtls
     bx_tx_cd: BxTxCdAttribute, //BxTxCd
-    rltd_pties: RltdPtiesAttribute, //RltdPties
+    pub(crate) rltd_pties: RltdPtiesAttribute, //RltdPties
     rmt_inf: RmtInfAttribute, //RmtInf
     rltd_dts: RltdDtsAttribute //RltdDts
 }
@@ -128,15 +128,15 @@ struct CdOrPrtryAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct IdTxDtlsAttribute{
+pub(crate) struct IdTxDtlsAttribute{
     id: String, //Id
-    other: IdDtldAttribute//Other
+    pub(crate) other: IdDtldAttribute//Other
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct IdDtldAttribute{
-    id: String
+pub(crate) struct IdDtldAttribute{
+    pub(crate) id: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -427,12 +427,12 @@ impl NtryAttribute {
 impl BxTxCdAttribute {
     fn default() -> Self{
         Self{
-            domn: DomnAttribute { cd: "Cd".to_string(), 
-                fmly: FmlyAttribute { cd: "Cd".to_string(), 
+            domn: DomnAttribute { cd: "Cd".to_string(),
+                fmly: FmlyAttribute { cd: "Cd".to_string(),
                     sub_fmly_cd: "SubFmlyCd".to_string() } },
             prtry: PrtryAttribute { cd: "Cd".to_string(), issr: "Issr".to_string() },
-            
-            
+
+
         }
     }
 }
@@ -464,19 +464,19 @@ impl TxDtlsAttribute {
             refs: EndToEndIdAttribute { end_to_end_id: "EndToEndId".to_string() },
             amt_dtls: TxAmtAttribute { end_to_end_id: "EndToEndId".to_string() },
             bx_tx_cd: BxTxCdAttribute::default(),
-            rltd_pties: RltdPtiesAttribute { 
-                cdtr_acct: IdTxDtlsAttribute { 
-                    id: "Id".to_string(), 
-                    other: IdDtldAttribute { 
+            rltd_pties: RltdPtiesAttribute {
+                cdtr_acct: IdTxDtlsAttribute {
+                    id: "Id".to_string(),
+                    other: IdDtldAttribute {
                         id: "Id".to_string() } } },
-            rmt_inf: RmtInfAttribute { 
-                strd: CdtrRefInfAttribute { 
-                    tp: CdOrPrtryAttribute { 
-                        cd_or_prty: CdAttribute { 
-                            cd: "Cd".to_string() } }, 
+            rmt_inf: RmtInfAttribute {
+                strd: CdtrRefInfAttribute {
+                    tp: CdOrPrtryAttribute {
+                        cd_or_prty: CdAttribute {
+                            cd: "Cd".to_string() } },
                     ref_cdtr: "RefCdtr".to_string() } },
             rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "AccptNcDtTm".to_string() },
         }
-        
+
     }
 }

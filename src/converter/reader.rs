@@ -107,7 +107,7 @@ impl DocumentMt940 {
         }
         None
     }
-    fn parse_field_61(field: &str, ntry: &mut NtryAttribute){
+    fn parse_field_61(field: &str, vault: &str, ntry: &mut NtryAttribute){
         let regex = Regex::new(r"(\d{6})(\d{4})([CD])(\d+,\d+)([A-Z]{4})(\w+)");
         if let Ok(regex) = regex {
             if let Some(capture) = regex.captures(field) {
@@ -116,10 +116,12 @@ impl DocumentMt940 {
                 ntry.book_dt = DtAttribute::format_dt(&dt);
                 ntry.bx_tx_cd.prtry.cd = capture[5].to_string();
                 ntry.amt = capture[4].replace(",", ".").to_string();
+                ntry.ccy = vault.to_string();
                 ntry.cdt_dbt_ind  = if capture[3].to_string() == "C".to_string(){
                     "CRDT".to_string()
                 } else { "DBIT".to_string()};
                 let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
+                DocumentMt940::parse_field_86(field, &mut nxdet);
                 let mut tlds: TxDtlsAttribute = TxDtlsAttribute::default();
                 tlds.refs.end_to_end_id = capture[6].to_string();
                 nxdet.btch.tx_dtls.push(tlds);
@@ -127,16 +129,51 @@ impl DocumentMt940 {
         }
     }
 
-    fn parse_field_86(field: &str, ntry: &mut NtryAttribute){
-       //let regex = Regex::new(r":84:([\n\w\d ,/-]+):");
-       // if let Ok(regex) = regex {
-       //     if let Some(capture) = regex.captures(header) {
-        //        ntry.amt = capture[1].to_string();
-        //    }
-        //}
+    fn parse_field_86(field: &str, ntrydet: &mut NtryDtlsAttribute) {
+       let reg_pattern = Regex::new(r"/([A-Z]{4})/([^/]*)");
+        if let Ok(regexp) = reg_pattern {
+            let mut tlds: TxDtlsAttribute = TxDtlsAttribute::default();
+            for capture in regexp.captures_iter(field){
+                match &capture[1] {
+                    "EREF" =>{
+                        tlds.refs.end_to_end_id = capture[2].to_string();
+                    },
+                    "CRNM" =>{
+
+                    },
+                    "CACT" => {
+                        tlds.rltd_pties.cdtr_acct.other.id = capture[2].to_string();
+                    },
+                    "CBIC" => {
+                       // tlds.
+                    },
+                    "REMI" =>{
+
+                    },
+                    "OPRP" =>{
+
+                    },
+                    "DACT" =>{
+
+                    },
+                    "DBIC" =>{
+
+                    },
+                    "OAMT" =>{
+
+                    },
+                    "DCID" =>{
+
+                    },
+                    _ => {}
+                }
+
+            }
+            ntrydet.btch.tx_dtls.push(tlds);
+        }
     }
 
-    fn parse_field_61_84(header: &str) -> Option<Vec<NtryAttribute>>{
+    fn parse_field_ntry(header: &str, vault: &str) -> Option<Vec<NtryAttribute>>{
         let mut reg_pattern = Regex::new(r":61:([\n\w\d ,/-]+):");
         let mut field_61: Vec<String> = Vec::new();
         let mut field_86: Vec<String> = Vec::new();
@@ -155,8 +192,7 @@ impl DocumentMt940 {
         let unions: Vec<(String, String)> = field_61.into_iter().zip(field_86.into_iter()).collect();
         for union in unions.iter(){
             let mut ntry = NtryAttribute::default();
-            DocumentMt940::parse_field_61(&union.0, &mut ntry);
-            DocumentMt940::parse_field_86(&union.1, &mut ntry);
+            DocumentMt940::parse_field_61(&union.0, vault, &mut ntry);
             nxtry.push(ntry);
         }
         Some(nxtry)
@@ -209,9 +245,10 @@ impl DocumentMt940 {
                 }
             }
         }
-        if let Some(ntry) = DocumentMt940::parse_field_61_84(&header){
+        if let Some(ntry) = DocumentMt940::parse_field_ntry(&header,
+                                                            &document.stmt.bal[0].ccy){
             document.stmt.ntry = ntry;
-        }
+        }//todo: replace this only test
     }
 
     fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
