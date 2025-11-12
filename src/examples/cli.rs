@@ -1,5 +1,5 @@
 use std::env;
-use bank_converter::converter::parser::{PipelineParse};
+use bank_converter::converter::parser::{PipelineConverter};
 
 fn main() {
     // Получаем аргументы командной строки
@@ -14,7 +14,7 @@ fn main() {
         eprintln!("  --out_format CSV|XML|MT940|CAMT.053");
         return;
     }
-    let mut args_result = PipelineParse::default();
+    let mut args_result = PipelineConverter::default();
     while args.len() > 0 
     {
         match args.remove(0).as_str(){
@@ -26,11 +26,11 @@ fn main() {
             }
             "--in_format" => {
                 let format = args.remove(0);
-                args_result.data_in.format_type = PipelineParse::get_format_type_from_string(&format);
+                args_result.data_in.format_type = PipelineConverter::get_format_type_from_string(&format);
             }
             "--out_format" => {
                 let format = args.remove(0);
-                args_result.data_out.format_type = PipelineParse::get_format_type_from_string(&format);
+                args_result.data_out.format_type = PipelineConverter::get_format_type_from_string(&format);
             }
             _ => {
                 eprintln!("Неизвестная команда");
