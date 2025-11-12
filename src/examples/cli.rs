@@ -19,7 +19,7 @@ fn main() {
     {
         match args.remove(0).as_str(){
             "-i" => {
-                args_result.data_in.file_name = args.remove(0)
+                //args_result.data_in.file_name = args.remove(0)
             }
             "-o" => {
                 args_result.data_out.file_name = args.remove(0);

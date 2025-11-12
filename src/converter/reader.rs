@@ -10,11 +10,11 @@ use regex::{Regex};
 
 
 pub struct InputDataType {
-    format_type: FormatType,
-    buff_read: Stdin,
+    pub format_type: FormatType,
+    pub buff_read: Option<Stdin>,
 }
 
-enum Document{
+pub(crate) enum Document{
     DocumentCamt053(Result<DocumentCamt053, ParserError>),
     DocumentMt940(Result<DocumentMt940, ParserError>),
     DocumentCsv(Result<DocumentCsv, ParserError>),
@@ -25,13 +25,13 @@ impl From<InputDataType> for Document {
     fn from(value: InputDataType) -> Self {
         match value.format_type {
             FormatType::Camt053 | FormatType::Xml => {
-                Self::DocumentCamt053(DocumentCamt053::from_camt053(value.buff_read))
+                Self::DocumentCamt053(DocumentCamt053::from_camt053(value.buff_read.unwrap()))
             },
             FormatType::Mt940 => {
-                Self::DocumentMt940(DocumentMt940::from_mt940(value.buff_read))
+                Self::DocumentMt940(DocumentMt940::from_mt940(value.buff_read.unwrap()))
             }
             FormatType::Csv => {
-                Self::DocumentCsv(DocumentCsv::from_csv(value.buff_read))
+                Self::DocumentCsv(DocumentCsv::from_csv(value.buff_read.unwrap()))
             },
             _ => { Self::None(ParserError::BadInputFormatFile("Bad input type file".to_string())) }
         }

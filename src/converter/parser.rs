@@ -1,5 +1,6 @@
 use std::io::pipe;
 use crate::errors::ConvertError;
+use crate::converter::reader::{Document, InputDataType};
 
 #[derive(PartialEq)]
 pub enum FormatType {
@@ -11,7 +12,7 @@ pub enum FormatType {
 }
 
 pub struct PipelineConverter {
-    pub data_in: InOutData,
+    pub data_in: InputDataType,
     pub data_out: InOutData
 }
 
@@ -31,20 +32,14 @@ impl PipelineConverter {
         }
     }
     
-    pub fn convert_file(pipeline: PipelineConverter) -> Result<(), ConvertError>{
-        if pipeline.data_in.format_type == FormatType::None{
+    pub fn convert_file(pipeline: PipelineConverter) -> Result<(), ConvertError> {
+        if pipeline.data_in.format_type == FormatType::None {
             return Err(ConvertError::BadArgument("Not support input format".to_string()));
         }
-        if pipeline.data_out.format_type == FormatType::None{
+        if pipeline.data_out.format_type == FormatType::None {
             return Err(ConvertError::BadArgument("Not support output format".to_string()));
         }
-        match pipeline.data_in.format_type {  
-            FormatType::Csv => {},
-            FormatType::Xml => {},
-            FormatType::Mt940 => {},
-            FormatType::Camt053 => {},
-            _ =>{}
-        }
+        let document = Document::from(pipeline.data_in);
         Ok(())
     }
 }
@@ -55,6 +50,10 @@ impl Default for InOutData {
 }
 impl Default for PipelineConverter {
     fn default() -> Self {
-        PipelineConverter { data_in: InOutData::default(), data_out: InOutData::default() }
+        PipelineConverter { data_in: InputDataType{
+            format_type: FormatType::None,
+            buff_read: None
+        }, 
+            data_out: InOutData::default() }
     }
 }
