@@ -1,7 +1,8 @@
 use std::io::{BufRead, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
-use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053, DtAttribute, NtryAttribute};
+use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053,
+                             DtAttribute, NtryAttribute, NtryDtlsAttribute, TxDtlsAttribute};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
 use csv::Reader;
@@ -113,11 +114,15 @@ impl DocumentMt940 {
                 ntry.val_dt = DtAttribute::format_dt(&capture[1]);
                 let dt =  capture[1][0 .. 2].to_string() + &capture[2][0..4].to_string();
                 ntry.book_dt = DtAttribute::format_dt(&dt);
+                ntry.bx_tx_cd.prtry.cd = capture[5].to_string();
                 ntry.amt = capture[4].replace(",", ".").to_string();
                 ntry.cdt_dbt_ind  = if capture[3].to_string() == "C".to_string(){
                     "CRDT".to_string()
                 } else { "DBIT".to_string()};
-                //let mut nxdet = 
+                let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
+                let mut tlds: TxDtlsAttribute = TxDtlsAttribute::default();
+                tlds.refs.end_to_end_id = capture[6].to_string();
+                nxdet.btch.tx_dtls.push(tlds);
             }
         }
     }

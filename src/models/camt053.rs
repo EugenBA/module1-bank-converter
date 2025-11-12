@@ -56,7 +56,7 @@ pub (crate) struct NtryAttribute{
     pub(crate) book_dt: DtAttribute, //BookgDt
     pub(crate) val_dt: DtAttribute, //ValDt
     acct_svrc_ref: String, //AcctSvcrRef
-    bx_tx_cd: BxTxCdAttribute, //BkTxCd
+    pub(crate) bx_tx_cd: BxTxCdAttribute, //BkTxCd
     pub(crate) ntry_dtls: NtryDtlsAttribute//NtryDtls
 
 }
@@ -75,7 +75,7 @@ pub(crate) struct BtchAttribute{
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct TxDtlsAttribute {
-    refs: EndToEndIdAttribute, //Refs
+    pub(crate) refs: EndToEndIdAttribute, //Refs
     amt_dtls: TxAmtAttribute, //AmtDtls
     bx_tx_cd: BxTxCdAttribute, //BxTxCd
     rltd_pties: RltdPtiesAttribute, //RltdPties
@@ -148,9 +148,9 @@ struct AmtAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct BxTxCdAttribute{
+pub(crate) struct BxTxCdAttribute{
     domn: DomnAttribute, //Domn
-    prtry: PrtryAttribute//Prtry
+    pub(crate) prtry: PrtryAttribute//Prtry
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -169,8 +169,8 @@ struct FmlyAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct PrtryAttribute{
-    cd: String, //cd
+pub(crate) struct PrtryAttribute{
+    pub(crate) cd: String, //cd
     issr: String//Issr
 }
 
@@ -418,13 +418,21 @@ impl NtryAttribute {
             book_dt: DtAttribute { dt: "Dt".to_string() },
             val_dt: DtAttribute { dt: "Dt".to_string() },
             acct_svrc_ref: "AcctSvrcRef".to_string(),
-            bx_tx_cd: BxTxCdAttribute {
-                domn: DomnAttribute { cd: "Cd".to_string(),
-                    fmly: FmlyAttribute {
-                        cd: "Cd".to_string(),
-                        sub_fmly_cd: "SubFmlyCd".to_string() } },
-                prtry: PrtryAttribute { cd: "Cd".to_string(), issr: "Issr".to_string() } },
+            bx_tx_cd: BxTxCdAttribute::default(),
             ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0, tx_dtls: vec![] } },
+        }
+    }
+}
+
+impl BxTxCdAttribute {
+    fn default() -> Self{
+        Self{
+            domn: DomnAttribute { cd: "Cd".to_string(), 
+                fmly: FmlyAttribute { cd: "Cd".to_string(), 
+                    sub_fmly_cd: "SubFmlyCd".to_string() } },
+            prtry: PrtryAttribute { cd: "Cd".to_string(), issr: "Issr".to_string() },
+            
+            
         }
     }
 }
@@ -439,5 +447,36 @@ impl DtAttribute {
                 "1979-01-01".to_string()
             }
         }
+    }
+}
+
+impl NtryDtlsAttribute{
+    pub(crate) fn default() -> Self{
+        Self{
+            btch: BtchAttribute { nb_of_txs: 0, tx_dtls: Vec::new() },
+        }
+    }
+}
+
+impl TxDtlsAttribute {
+    pub(crate) fn default() -> Self{
+        Self{
+            refs: EndToEndIdAttribute { end_to_end_id: "EndToEndId".to_string() },
+            amt_dtls: TxAmtAttribute { end_to_end_id: "EndToEndId".to_string() },
+            bx_tx_cd: BxTxCdAttribute::default(),
+            rltd_pties: RltdPtiesAttribute { 
+                cdtr_acct: IdTxDtlsAttribute { 
+                    id: "Id".to_string(), 
+                    other: IdDtldAttribute { 
+                        id: "Id".to_string() } } },
+            rmt_inf: RmtInfAttribute { 
+                strd: CdtrRefInfAttribute { 
+                    tp: CdOrPrtryAttribute { 
+                        cd_or_prty: CdAttribute { 
+                            cd: "Cd".to_string() } }, 
+                    ref_cdtr: "RefCdtr".to_string() } },
+            rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "AccptNcDtTm".to_string() },
+        }
+        
     }
 }
