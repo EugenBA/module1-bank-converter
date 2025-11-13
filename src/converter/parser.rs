@@ -1,5 +1,6 @@
 use crate::errors::{ConvertError};
 use crate::converter::reader::{Document, InputDataType};
+use crate::converter::writer::OutDataType;
 
 #[derive(PartialEq)]
 pub enum FormatType {
@@ -12,7 +13,7 @@ pub enum FormatType {
 
 pub struct PipelineConverter {
     pub data_in: InputDataType,
-    pub data_out: InOutData
+    pub data_out: OutDataType
 }
 
 pub struct InOutData{
@@ -31,7 +32,10 @@ impl Default for PipelineConverter {
             format_type: FormatType::None,
             buff_read: None
         },
-            data_out: InOutData::default() }
+            data_out: OutDataType{
+                format_type: FormatType::None,
+                buff_write: None
+            } }
     }
 }
 
@@ -54,6 +58,7 @@ impl PipelineConverter {
             return Err(ConvertError::BadArgument("Not support output format".to_string()));
         }
         let document = Document::from(pipeline.data_in).parse_result?;
+        Document::to(document, pipeline.data_out)?;
         Ok(())
     }
 }
