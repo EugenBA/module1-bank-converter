@@ -14,26 +14,69 @@ pub struct InputDataType {
     pub buff_read: Option<Stdin>,
 }
 
-pub(crate) enum Document{
-    DocumentCamt053(Result<DocumentCamt053, ParserError>),
-    DocumentMt940(Result<DocumentMt940, ParserError>),
-    DocumentCsv(Result<DocumentCsv, ParserError>),
-    None(ParserError)
+pub(crate) enum DocumentType {
+    DocumentCamt053(DocumentCamt053),
+    DocumentMt940(DocumentMt940),
+    DocumentCsv(DocumentCsv)
+}
+
+pub(crate) struct Document{
+    pub(crate) parse_result: Result<DocumentType, ParserError>,
 }
 
 impl From<InputDataType> for Document {
     fn from(value: InputDataType) -> Self {
         match value.format_type {
             FormatType::Camt053 | FormatType::Xml => {
-                Self::DocumentCamt053(DocumentCamt053::from_camt053(value.buff_read.unwrap()))
+                match DocumentCamt053::from_camt053(value.buff_read.unwrap()) { 
+                    Ok(camt053) => {
+                        Self {
+                            parse_result:
+                            Ok(DocumentType::DocumentCamt053(camt053))
+                        }
+                    }
+                    Err(e) => {
+                        Self {
+                            parse_result: Err(e)
+                        }
+                    }
+                }
             },
             FormatType::Mt940 => {
-                Self::DocumentMt940(DocumentMt940::from_mt940(value.buff_read.unwrap()))
+                match DocumentMt940::from_mt940(value.buff_read.unwrap()) {
+                    Ok(mt940) => {
+                        Self {
+                            parse_result:
+                            Ok(DocumentType::DocumentMt940(mt940))
+                        }
+                    }
+                    Err(e) => {
+                        Self {
+                            parse_result: Err(e)
+                        }
+                    }
+                }
             }
             FormatType::Csv => {
-                Self::DocumentCsv(DocumentCsv::from_csv(value.buff_read.unwrap()))
+                match DocumentCsv::from_csv(value.buff_read.unwrap()) { 
+                    Ok(csv) => {
+                        Self {
+                            parse_result:
+                            Ok(DocumentType::DocumentCsv(csv))
+                        }
+                    }
+                    Err(e) => {
+                        Self {
+                            parse_result: Err(e)
+                        }
+                    }
+                }
             },
-            _ => { Self::None(ParserError::BadInputFormatFile("Bad input type file".to_string())) }
+            _ => {
+                Self {
+                    parse_result: Err(ParserError::BadInputFormatFile("Bad input type file".to_string()))
+                }
+            }
         }
     }
 }

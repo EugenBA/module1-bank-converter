@@ -1,5 +1,4 @@
-use std::io::pipe;
-use crate::errors::ConvertError;
+use crate::errors::{ConvertError};
 use crate::converter::reader::{Document, InputDataType};
 
 #[derive(PartialEq)]
@@ -21,6 +20,21 @@ pub struct InOutData{
     pub format_type: FormatType
 }
 
+impl Default for InOutData {
+    fn default() -> InOutData {
+        InOutData{ file_name: "".to_string(), format_type: FormatType::None }
+    }
+}
+impl Default for PipelineConverter {
+    fn default() -> Self {
+        PipelineConverter { data_in: InputDataType{
+            format_type: FormatType::None,
+            buff_read: None
+        },
+            data_out: InOutData::default() }
+    }
+}
+
 impl PipelineConverter {
     pub fn get_format_type_from_string(format_str: &String) -> FormatType {
         match format_str.to_lowercase().as_str() {
@@ -39,21 +53,7 @@ impl PipelineConverter {
         if pipeline.data_out.format_type == FormatType::None {
             return Err(ConvertError::BadArgument("Not support output format".to_string()));
         }
-        let document = Document::from(pipeline.data_in);
+        let document = Document::from(pipeline.data_in).parse_result?;
         Ok(())
-    }
-}
-impl Default for InOutData {
-    fn default() -> InOutData {
-        InOutData{ file_name: "".to_string(), format_type: FormatType::None }
-    }
-}
-impl Default for PipelineConverter {
-    fn default() -> Self {
-        PipelineConverter { data_in: InputDataType{
-            format_type: FormatType::None,
-            buff_read: None
-        }, 
-            data_out: InOutData::default() }
     }
 }

@@ -45,7 +45,11 @@ impl  From<csv::Error> for ParserError {
     }
 }
 
-
+impl From<ParserError> for ConvertError{
+    fn from(err: ParserError) -> Self {
+        ConvertError::ParseError(err.to_string())
+    }
+}
 impl Display for ConvertError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
