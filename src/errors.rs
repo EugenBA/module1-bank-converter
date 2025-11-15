@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter};
+use std::io::Error;
 use serde::Deserialize;
 use thiserror::Error;
 
@@ -16,7 +17,6 @@ pub(crate) enum ParserError
 {
     FileReadError(String),
     BadInputFormatFile(String),
-    FileWriteError(String),
     BadFormatType(String),
     BadCsvDeserializeError(String),
 }
@@ -24,9 +24,8 @@ pub(crate) enum ParserError
 impl Display for ParserError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ParserError::FileReadError(s) => write!(f, "File read error: {}", s),
+            ParserError::FileReadError(s) => write!(f, "File read or write error: {}", s),
             ParserError::BadInputFormatFile(s) => write!(f, "Bad input format file: {}", s),
-            ParserError::FileWriteError(s) => write!(f, "File write error: {}", s),
             ParserError::BadFormatType(s) => write!(f, "Bad format type: {}", s),
             ParserError::BadCsvDeserializeError(s) => write!(f, "Csv format deserialize error: {}", s),
         }
@@ -45,6 +44,12 @@ impl  From<csv::Error> for ParserError {
     }
 }
 
+impl From<std::io::Error> for ParserError {
+    fn from(value: Error) -> Self {
+        ParserError::FileReadError(value.to_string())
+    }
+}
+
 impl From<ParserError> for ConvertError{
     fn from(err: ParserError) -> Self {
         ConvertError::ParseError(err.to_string())
@@ -58,6 +63,19 @@ impl Display for ConvertError {
             ConvertError::WriteError(s) => write!(f, "Write error: {}", s),
         }
     }
+}
+
+impl  From<serde_xml_rs::Error> for ConvertError{
+    fn from(err: serde_xml_rs::Error) -> Self {
+        ConvertError::WriteError(err.to_string())
+    }
+}
+
+impl From<std::io::Error>  for ConvertError{
+    fn from(value: Error) -> Self {
+        ConvertError::WriteError(value.to_string())
+    }
+
 }
 
 

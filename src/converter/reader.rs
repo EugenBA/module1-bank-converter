@@ -1,4 +1,4 @@
-use std::io::{BufRead, Stdin};
+use std::io::{BufRead, Read, Stdin};
 use crate::converter::parser::FormatType;
 use crate::errors::ParserError;
 use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053,
@@ -138,13 +138,14 @@ impl DocumentMt940 {
     }
 
     fn parse_field_balance(header: &str) -> Option<BalanceAttribute>{
-        let regex = Regex::new(r"C(\d{6})([A-Z]+)(\d+,\d+)");
+        let regex = Regex::new(r"([CD])(\d{6})([A-Z]+)(\d+,\d+)");
         if let Ok(regex) = regex {
             if let Some(capture) = regex.captures(header) {
                 let mut balance = BalanceAttribute::default();
-                balance.dt= DtAttribute::format_dt(&capture[1]);
-                balance.ccy = capture[2].to_string();
-                balance.amt = capture[3].replace(",", ".").to_string();
+                balance.dt= DtAttribute::format_dt(&capture[2]);
+                balance.ccy = capture[3].to_string();
+                balance.amt = capture[4].replace(",", ".").to_string();
+                balance.cd = capture[1].to_string();
                 return Some(balance);
             }
         }
@@ -276,7 +277,7 @@ impl DocumentMt940 {
                                 if *reg_code == "64" {
                                     balance.tp.cd_or_party.cd = "ITAV".to_string();
                                 }
-                                if *reg_code == "60F" {
+                                if *reg_code == "65" {
                                     balance.tp.cd_or_party.cd = "FPAV".to_string();
                                 }
                                 document.stmt.bal.push(balance);
@@ -322,6 +323,7 @@ impl DocumentMt940 {
 
     fn from_mt940(buf_read: Stdin) -> Result<Self, ParserError> {
         let mut regex_pattern = String::new();
+        buf_read.lock().read_to_string(&mut regex_pattern)?;
         if let Some(records) = DocumentMt940::find_record(&regex_pattern) {
             for record in records {
                 DocumentMt940::parse_one_record(&regex_pattern[record.0..record.1]);

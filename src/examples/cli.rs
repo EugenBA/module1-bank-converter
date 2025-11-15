@@ -1,5 +1,5 @@
 use std::env;
-use bank_converter::converter::parser::{PipelineConverter};
+use bank_converter::converter::parser::{FormatType, PipelineConverter};
 
 fn main() {
     // Получаем аргументы командной строки
@@ -15,14 +15,16 @@ fn main() {
         return;
     }
     let mut args_result = PipelineConverter::default();
+    let mut in_file = String::new();
+    let mut out_file = String::new();
     while args.len() > 0 
     {
         match args.remove(0).as_str(){
             "-i" => {
-                //args_result.data_in.file_name = args.remove(0)
+                in_file = args.remove(0);
             }
             "-o" => {
-               // args_result.data_out.file_name = args.remove(0);
+                out_file = args.remove(0);
             }
             "--in_format" => {
                 let format = args.remove(0);
@@ -36,6 +38,23 @@ fn main() {
                 eprintln!("Неизвестная команда");
                 return;
             }
+        }
+    }
+    if in_file.is_empty() || out_file.is_empty()  {
+        eprintln!("Не указаны входной или выходной файл");
+        return;
+    }
+    if args_result.data_in.format_type == FormatType::None ||
+        args_result.data_out.format_type == FormatType::None {
+        eprintln!("Не указаны форматы входного или выходного файла");
+    }
+    if args_result.data_in.format_type == args_result.data_out.format_type {
+        eprintln!("Выбран один и тот же формат для входного и выходного файлов");
+    }
+    match PipelineConverter::convert_file(args_result) {
+        Ok(_) => { println!("Конвертация выполнена успешно")}
+        Err(e) => {
+            eprintln!("Ошибка конвертации: {}", e);
         }
     }
 }

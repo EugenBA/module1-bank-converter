@@ -3,14 +3,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-pub struct DocumentCamt053 {
+pub(crate) struct DocumentCamt053 {
     #[serde(rename="@xlmns")]
     xlmns: String,
     #[serde(rename="@xlmns:xsi")]
     xmlns_xsi: String,
     #[serde(rename="@xsi:schemaLocation")]
     xsi_schema_location: String,
-    bk_to_cstm: Vec<BkToCstmAttribute>
+    pub(crate) bk_to_cstm: Vec<BkToCstmAttribute>
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -134,7 +134,7 @@ pub(crate) struct CdtrAttribue{
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct RmtInfAttribute{
-    pub(crate) strd: CdtrRefInfAttribute,
+    strd: CdtrRefInfAttribute,
     pub(crate) ustrd: String
 }
 
@@ -174,7 +174,7 @@ pub(crate) struct IdDtldAttribute{
 #[serde(rename_all = "PascalCase")]
 struct AmtAttribute{
     #[serde(rename="@Ccy")]
-    ccy: f64 //Ccy
+    ccy: String//Ccy
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -237,7 +237,9 @@ pub(crate) struct BalanceAttribute{
     pub(crate) amt: String,
     #[serde(rename="@Ccy")]
     pub(crate) ccy: String,
-    pub(crate) dt:  DtAttribute
+    pub(crate) dt:  DtAttribute,
+    #[serde(skip_serializing)]
+    pub(crate) cd: String
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
@@ -434,6 +436,7 @@ impl BalanceAttribute {
             amt: "".to_string(),
             ccy: "Ccy".to_string(),
             dt: DtAttribute { dt: "DT".to_string() },
+            cd: "Cd".to_string(),
         }
     }
 
@@ -526,3 +529,4 @@ impl TxDtlsAttribute {
         }
     }
 }
+
