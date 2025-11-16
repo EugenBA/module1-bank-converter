@@ -1,5 +1,44 @@
-use std::env;
-use bank_converter::converter::parser::{FormatType, PipelineConverter};
+use std::{env, io};
+use std::fs::File;
+use std::io::{BufReader, Read, Write};
+use std::path::Path;
+
+#[derive(PartialEq)]
+pub enum FormatType {
+    None,
+    Csv,
+    Xml,
+    Mt940,
+    Camt053,
+}
+
+pub struct PipelineConverter<T: Read, W: Write> {
+    pub data_in: InputDataType<T>,
+    pub data_out: OutDataType<W>
+}
+
+pub struct OutDataType<T:Write> {
+    pub format_type: FormatType,
+    pub(crate) buff_write: Option<T>,
+}
+
+pub struct InputDataType<T:Read> {
+    pub format_type: FormatType,
+    pub buff_read: Option<T>,
+}
+
+impl<T:Read, W:Write>  PipelineConverter<T, W> {
+    pub fn get_format_type_from_string(format_str: &String) -> FormatType {
+        match format_str.to_lowercase().as_str() {
+            "csv" => FormatType::Csv,
+            "xml" => FormatType::Xml,
+            "mt940" => FormatType::Mt940,
+            "camt053" => FormatType::Camt053,
+            _ => FormatType::None
+        }
+    }
+}
+
 
 fn main() {
     // Получаем аргументы командной строки
@@ -51,11 +90,11 @@ fn main() {
     if args_result.data_in.format_type == args_result.data_out.format_type {
         eprintln!("Выбран один и тот же формат для входного и выходного файлов");
     }
-    
-    match PipelineConverter::convert_file(args_result) {
-        Ok(_) => { println!("Конвертация выполнена успешно")}
-        Err(e) => {
-            eprintln!("Ошибка конвертации: {}", e);
-        }
+    if !Path::new(&in_file).exists() {
+        eprintln!("Файл {} не существует", in_file);
+        return;
     }
+    let file = File::open(in_file).unwrap();
+    //args_result.data_in.buff_read = BufReader::new(file).;
+   
 }

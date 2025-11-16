@@ -1,5 +1,4 @@
-use std::io::{BufRead, Read, Stdin};
-use crate::converter::parser::FormatType;
+use std::io::{Read};
 use crate::errors::ParserError;
 use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053,
                              DtAttribute, NtryAttribute, NtryDtlsAttribute, TxDtlsAttribute};
@@ -9,26 +8,19 @@ use csv::Reader;
 use regex::{Regex};
 
 
-pub struct InputDataType {
-    pub format_type: FormatType,
-    pub buff_read: Option<Stdin>,
-}
 
-pub(crate) enum DocumentType {
-    DocumentCamt053(DocumentCamt053),
-    DocumentMt940(DocumentMt940),
-    DocumentCsv(DocumentCsv)
-}
 
+
+/*
 pub(crate) struct Document{
     pub(crate) parse_result: Result<DocumentType, ParserError>,
 }
 
-impl From<InputDataType> for Document {
-    fn from(value: InputDataType) -> Self {
+impl <T:Read> From<InputDataType<T>> for Document {
+    fn from(value: InputDataType<T>) -> Self {
         match value.format_type {
             FormatType::Camt053 | FormatType::Xml => {
-                match DocumentCamt053::from_camt053(value.buff_read.unwrap()) { 
+                match DocumentCamt053::from_read(&mut value.buff_read.unwrap()) {
                     Ok(camt053) => {
                         Self {
                             parse_result:
@@ -43,7 +35,7 @@ impl From<InputDataType> for Document {
                 }
             },
             FormatType::Mt940 => {
-                match DocumentMt940::from_mt940(value.buff_read.unwrap()) {
+                match DocumentMt940::from_read(&mut value.buff_read.unwrap()) {
                     Ok(mt940) => {
                         Self {
                             parse_result:
@@ -58,7 +50,7 @@ impl From<InputDataType> for Document {
                 }
             }
             FormatType::Csv => {
-                match DocumentCsv::from_csv(value.buff_read.unwrap()) { 
+                match DocumentCsv::from_read(&mut value.buff_read.unwrap()) {
                     Ok(csv) => {
                         Self {
                             parse_result:
@@ -79,21 +71,16 @@ impl From<InputDataType> for Document {
             }
         }
     }
-}
+}*/
 
 impl DocumentCamt053 {
     pub fn new() -> Self {
         DocumentCamt053::default()
     }
-    
-    fn from_camt053(buf_read: Stdin) -> Result<Self, ParserError> {
-        let mut reader = buf_read.lock();
+
+    pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
         let mut xml_str = String::new();
-        while let Ok(byte_reader) = reader.read_line(&mut xml_str) {
-            if byte_reader == 0 {
-                break;
-            }
-        }
+        r.read_to_string(&mut xml_str)?;
         serde_xml_rs::from_str(&xml_str)?
     }
 
@@ -321,9 +308,9 @@ impl DocumentMt940 {
         Some(record)
     }
 
-    fn from_mt940(buf_read: Stdin) -> Result<Self, ParserError> {
+    pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
         let mut regex_pattern = String::new();
-        buf_read.lock().read_to_string(&mut regex_pattern)?;
+        r.read_to_string(&mut regex_pattern)?;
         if let Some(records) = DocumentMt940::find_record(&regex_pattern) {
             for record in records {
                 DocumentMt940::parse_one_record(&regex_pattern[record.0..record.1]);
@@ -334,10 +321,9 @@ impl DocumentMt940 {
 }
 
 impl DocumentCsv {
-    fn from_csv(buf_read: Stdin) -> Result<Self, ParserError> {
-        let reader = buf_read.lock();
+    pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
         let mut csv_document: DocumentCsv = DocumentCsv::new();
-        let mut csv_rdr = Reader::from_reader(reader);
+        let mut csv_rdr = Reader::from_reader(r);
         for row in csv_rdr.deserialize() {
             let row_data: RowCsv = row?;
             csv_document.rows.push(row_data);

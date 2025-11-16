@@ -78,4 +78,11 @@ impl From<std::io::Error>  for ConvertError{
 
 }
 
+impl From<csv::Error> for ConvertError {
+    fn from(err: csv::Error) -> Self {
+        ConvertError::WriteError(err.to_string())
+    }
+
+}
+
 
