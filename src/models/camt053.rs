@@ -26,7 +26,7 @@ pub(crate) struct BkToCstmAttribute{
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct HeaderAttribute{
     pub(crate) msg_id: String, //message id
-    crd_dt_tm: String, //datetime create file
+    pub(crate) crd_dt_tm: String, //datetime create file
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -265,7 +265,7 @@ struct FromToDtAttribute{
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate)  struct AccAttribute{
-    id: IdIbanAttribute, //id
+    pub(crate) id: IdIbanAttribute, //id
     #[serde(rename="@Ccy")]
     ccy: String, //Ccy
     nm: String, //nm
@@ -276,8 +276,9 @@ pub(crate)  struct AccAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct IdIbanAttribute{
+pub(crate) struct IdIbanAttribute{
     iban: String, //IBAN
+    pub(crate) othr: OtherAttribute,
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
@@ -292,7 +293,7 @@ pub(crate)  struct FinInstIdAttribute{
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct OwnerAttribute{
-    nm: String, //nm
+    pub(crate) nm: String, //nm
     pstl_addr: PostalAddressAttribute, //pstl_addr
     bldg_nb: u32, //BldgNb
     pst_cd: u32, //PstCd
@@ -401,7 +402,9 @@ impl TxsSummryAttribute {
 impl AccAttribute {
     pub(crate) fn default() -> Self{
         Self{
-            id: IdIbanAttribute { iban: "Iban".to_string() },
+            id: IdIbanAttribute { iban: "Iban".to_string(),
+                othr: OtherAttribute { id: "".to_string(),
+                    schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
             ccy: "Ccy".to_string(),
             nm: "Nm".to_string(),
             ownr: OwnerAttribute::default(),
