@@ -495,8 +495,8 @@ impl NtryDtlsAttribute{
 impl TxDtlsAttribute {
     pub(crate) fn default() -> Self {
         Self {
-            refs: EndToEndIdAttribute { end_to_end_id: "EndToEndId".to_string() },
-            amt_dtls: TxAmtAttribute { end_to_end_id: "EndToEndId".to_string(), amt: "amt".to_string() },
+            refs: EndToEndIdAttribute { end_to_end_id: "".to_string() },
+            amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
             bx_tx_cd: BxTxCdAttribute::default(),
             rltd_pties: RltdPtiesAttribute {
                 cdtr_acct: IdTxDtlsAttribute {
@@ -506,26 +506,26 @@ impl TxDtlsAttribute {
                     }
                 },
                 dbtr_acct: IdTxDtlsAttribute {
-                    id: "id".to_string(),
-                    other: IdDtldAttribute { id: "id".to_string() }
+                    id: "".to_string(),
+                    other: IdDtldAttribute { id: "".to_string() }
                 },
-                cdtr: CdtrAttribue { nm: "nm".to_string() },
-                dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute { id: "id".to_string() } } },
+                cdtr: CdtrAttribue { nm: "".to_string() },
+                dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } } },
             },
             rmt_inf: RmtInfAttribute {
                 strd: CdtrRefInfAttribute {
                     tp: CdOrPrtryAttribute {
                         cd_or_prty: CdAttribute {
-                            cd: "Cd".to_string()
+                            cd: "".to_string()
                         }
                     },
-                    ref_cdtr: "RefCdtr".to_string()
+                    ref_cdtr: "".to_string()
                 },
-                ustrd: "ustrd".to_string(),
+                ustrd: "".to_string(),
             },
-            rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "AccptNcDtTm".to_string() },
-            rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute { bic: "bic".to_string() } },
-            addtl_tx_inf: "AddtlTxInf".to_string(),
+            rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "".to_string() },
+            rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute { bic: "".to_string() } },
+            addtl_tx_inf: "".to_string(),
         }
     }
 }

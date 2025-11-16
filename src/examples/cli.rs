@@ -51,6 +51,7 @@ fn main() {
     if args_result.data_in.format_type == args_result.data_out.format_type {
         eprintln!("Выбран один и тот же формат для входного и выходного файлов");
     }
+    
     match PipelineConverter::convert_file(args_result) {
         Ok(_) => { println!("Конвертация выполнена успешно")}
         Err(e) => {

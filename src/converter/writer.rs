@@ -40,7 +40,70 @@ impl WritableData{
     }
 
     fn mt940_field_61_86(record_camt: &Vec<NtryAttribute>, record_write: &mut String) {
-
+        for ntry in record_camt {
+            record_write.push_str(":61:");
+            let mut dt = ntry.val_dt.dt.replace("-", "");
+            if dt.len() >= 10 {
+                record_write.push_str(&dt[2.. 10]);
+            }
+            dt = ntry.book_dt.dt.replace("-", "");
+            if dt.len() >= 10 {
+                record_write.push_str(&dt[4.. 10]);
+            }
+            if ntry.cdt_dbt_ind == "CRDT" {
+                record_write.push_str(":C")}
+            else {record_write.push_str(":D")};
+            record_write.push_str(ntry.amt.replace(".", ",").as_ref());
+            record_write.push_str(ntry.bx_tx_cd.prtry.cd.as_ref());
+            if !ntry.ntry_dtls.btch.tx_dtls.is_empty() {
+                record_write.push_str(ntry.ntry_dtls.btch.tx_dtls[0].refs.end_to_end_id.as_ref());
+            }
+            for tx_dtls in &ntry.ntry_dtls.btch.tx_dtls {
+                record_write.push_str(":86:/NREF/");
+                record_write.push_str(tx_dtls.refs.end_to_end_id.as_ref());
+                record_write.push_str("\n");
+                if !tx_dtls.rltd_pties.cdtr.nm.is_empty() {
+                    record_write.push_str("/CRNM/");
+                    record_write.push_str(tx_dtls.rltd_pties.cdtr.nm.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.rltd_pties.cdtr_acct.other.id.is_empty() {
+                    record_write.push_str("/CACT/");
+                    record_write.push_str(tx_dtls.rltd_pties.cdtr_acct.other.id.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.rltd_agts.cdtr_agt.bic.is_empty() {
+                    record_write.push_str("/CBIC/");
+                    record_write.push_str(tx_dtls.rltd_agts.cdtr_agt.bic.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.rmt_inf.ustrd.is_empty() {
+                    record_write.push_str("/REMI/");
+                    record_write.push_str(tx_dtls.rmt_inf.ustrd.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.addtl_tx_inf.is_empty() {
+                    record_write.push_str("/OPRP/");
+                    record_write.push_str(tx_dtls.addtl_tx_inf.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.rltd_pties.dbtr_acct.other.id.is_empty() {
+                    record_write.push_str("/DACT/");
+                    record_write.push_str(tx_dtls.rltd_pties.dbtr_acct.other.id.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.amt_dtls.amt.is_empty(){
+                    record_write.push_str("/OAMT/");
+                    record_write.push_str(tx_dtls.amt_dtls.amt.as_ref());
+                    record_write.push_str("\n");
+                }
+                if !tx_dtls.rltd_pties.dbtr.id.othr.id.is_empty(){
+                    record_write.push_str("/DCID/");
+                    record_write.push_str(tx_dtls.rltd_pties.dbtr.id.othr.id.as_ref());
+                    record_write.push_str("\n");
+                }
+            }
+        }
     }
     fn to_mt940(&self, buff_write: Stdout) -> Result<(), ConvertError> {
         let mut record_write = String::new();
@@ -65,7 +128,7 @@ impl WritableData{
             record_write.push_str("\n");
             WritableData::mt940_field_6x(&record, &mut record_write);
             WritableData::mt940_field_61_86(&record.stmt.ntry, &mut record_write);
-            record_write.push_str("{5:-}\n");
+            record_write.push_str("}\n{5:-}\n");
             writer.write_all(record_write.as_bytes())?;
             writer.flush()?;
             record_write.clear();
