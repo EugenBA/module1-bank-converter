@@ -11,6 +11,7 @@ pub struct DocumentCsv {
 }
 csv_data!(RowCsv, String, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u);
 
+
 impl DocumentCsv {
     pub(crate) fn new() -> Self{
         Self{rows: Vec::new()}
@@ -127,8 +128,8 @@ impl DocumentCsv {
         if let Some(ccy) = DocumentCsv::extract_ccy(&self.rows[7].c){
             camt_bk_to_cstm.stmt.acct.ccy =ccy;
         }
-        for index_row in [9..self.rows.len()] {
-            let row = &self.rows[index_row][0];
+        for index_row in 9..self.rows.len() {
+            let row = &self.rows[index_row];
             if row.b.is_empty() {
                 break;
             }

@@ -1,10 +1,15 @@
-use std::{env, io};
+use std::{env};
 use std::fs::File;
-use std::io::{BufReader, Read, Write};
+use std::io::{Read, Write};
 use std::path::Path;
+use bank_converter::errors::{ConvertError};
+use bank_converter::models::camt053::{DocumentCamt053};
+use bank_converter::models::mt940::{DocumentMt940};
+use bank_converter::models::csv::{DocumentCsv};
+use crate::Document::DocumentCamt053;
 
 #[derive(PartialEq)]
-pub enum FormatType {
+enum FormatType {
     None,
     Csv,
     Xml,
@@ -12,22 +17,20 @@ pub enum FormatType {
     Camt053,
 }
 
-pub struct PipelineConverter<T: Read, W: Write> {
-    pub data_in: InputDataType<T>,
-    pub data_out: OutDataType<W>
+enum Document{
+    DocumentCamt053(DocumentCamt053),
+    DocumentMt940(DocumentMt940),
+    DocumentCsv(DocumentCsv),
+    None
 }
 
-pub struct OutDataType<T:Write> {
-    pub format_type: FormatType,
-    pub(crate) buff_write: Option<T>,
+struct PipelineConverter{
+    pub data_in: FormatType,
+    pub data_out: FormatType
 }
 
-pub struct InputDataType<T:Read> {
-    pub format_type: FormatType,
-    pub buff_read: Option<T>,
-}
 
-impl<T:Read, W:Write>  PipelineConverter<T, W> {
+impl<T:Read, W:Write>  PipelineConverter {
     pub fn get_format_type_from_string(format_str: &String) -> FormatType {
         match format_str.to_lowercase().as_str() {
             "csv" => FormatType::Csv,
@@ -37,6 +40,44 @@ impl<T:Read, W:Write>  PipelineConverter<T, W> {
             _ => FormatType::None
         }
     }
+    pub fn default() -> Self {
+        Self {
+            data_in: FormatType::None,
+            data_out: FormatType::None
+        }
+    }
+    fn read_document(&self, r: &mut T) -> Result<Document, ConvertError> {
+        match self.data_in {
+            FormatType::None => {
+                Err(ConvertError::BadArgument("Not support input format".to_string()))
+            }
+            FormatType::Csv => {
+                Ok(Document::DocumentCsv(DocumentCsv::from_read(r)?))
+            }
+            FormatType::Mt940 => {
+                Ok(Document::DocumentMt940(DocumentMt940::from_read(r)?))
+            }
+            FormatType::Camt053 | FormatType::Xml => {
+                Ok(Document::DocumentCamt053(DocumentCamt053::from_read(r)?))
+            }
+        }
+    }
+    fn write_document(&self, w: &mut W, document: &DocumentCamt053) -> Result<(), ConvertError> {
+
+        Ok(())
+    }
+    fn convert(&self, r: &mut T, w: &mut W) -> Result<(), ConvertError> {
+        let document = self.read_document(r)?;
+        let camt = match document {
+            Document::DocumentCamt053(doc) => doc,
+            Document::DocumentMt940(doc) => { DocumentCamt053::from(doc)},
+            Document::DocumentCsv(doc) => { DocumentCamt053::from(doc)},
+            Document::None => { return Err(ConvertError::BadArgument("Not support input format".to_string()))}
+        };
+        self.write_document(w, &camt)?;
+        Ok(())
+    }
+
 }
 
 
@@ -67,11 +108,11 @@ fn main() {
             }
             "--in_format" => {
                 let format = args.remove(0);
-                args_result.data_in.format_type = PipelineConverter::get_format_type_from_string(&format);
+                args_result.data_in = PipelineConverter::get_format_type_from_string(&format);
             }
             "--out_format" => {
                 let format = args.remove(0);
-                args_result.data_out.format_type = PipelineConverter::get_format_type_from_string(&format);
+                args_result.data_out = PipelineConverter::get_format_type_from_string(&format);
             }
             _ => {
                 eprintln!("Неизвестная команда");
@@ -83,11 +124,11 @@ fn main() {
         eprintln!("Не указаны входной или выходной файл");
         return;
     }
-    if args_result.data_in.format_type == FormatType::None ||
-        args_result.data_out.format_type == FormatType::None {
+    if args_result.data_in == FormatType::None ||
+        args_result.data_out == FormatType::None {
         eprintln!("Не указаны форматы входного или выходного файла");
     }
-    if args_result.data_in.format_type == args_result.data_out.format_type {
+    if args_result.data_in == args_result.data_out{
         eprintln!("Выбран один и тот же формат для входного и выходного файлов");
     }
     if !Path::new(&in_file).exists() {
@@ -95,6 +136,6 @@ fn main() {
         return;
     }
     let file = File::open(in_file).unwrap();
-    //args_result.data_in.buff_read = BufReader::new(file).;
-   
+    let writer = File::create(out_file).unwrap();
+
 }

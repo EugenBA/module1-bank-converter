@@ -13,7 +13,7 @@ pub enum ConvertError
 
 
 #[derive(Error, Debug, Deserialize)]
-pub(crate) enum ParserError
+pub enum ParserError
 {
     FileReadError(String),
     BadInputFormatFile(String),

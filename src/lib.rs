@@ -1,4 +1,4 @@
-mod errors;
+pub mod errors;
 pub mod converter;
-mod models;
+pub mod models;
 mod macros;

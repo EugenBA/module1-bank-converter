@@ -1,5 +1,6 @@
 use crate::models::camt053::{BkToCstmAttribute, NtryAttribute};
-pub(crate) struct DocumentMt940 {
+
+pub struct DocumentMt940 {
     pub(crate) document: Vec<BkToCstmAttribute>
 }
 
