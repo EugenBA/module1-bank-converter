@@ -3,7 +3,8 @@ use serde::Serialize;
 use serde::Deserialize;
 use crate::csv_data;
 use crate::errors::ParserError;
-use crate::models::camt053::{BkToCstmAttribute, DocumentCamt053, NtryAttribute, NtryDtlsAttribute, TxDtlsAttribute};
+use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053,
+                             NtryAttribute, TxDtlsAttribute};
 
 pub struct DocumentCsv {
     pub(crate) rows: Vec<RowCsv>
@@ -81,6 +82,17 @@ impl DocumentCsv {
         None
     }
 
+    fn extract_crd_agent(val: &str, ntry_det: &mut TxDtlsAttribute) {
+        let reg_pattern = Regex::new(r"(\d+) ([\w ]+), (.+)");
+        if let Ok(regexp) = reg_pattern {
+            if let Some(capture) = regexp.captures(val)
+            {
+                ntry_det.rltd_agts.dbtr_agt.bic = capture[1].to_string();
+                ntry_det.rltd_agts.dbtr_agt.nm = capture[2].to_string();
+            }
+        }
+    }
+
     fn extract_ccy(val: &str) -> Option<String>{
         let ccy = val.replace("Российский рубль", "RUB")
             .replace("Доллар США", "USD")
@@ -147,13 +159,24 @@ impl DocumentCsv {
                 ntry_det.rltd_pties.cdtr.id.othr.id = debit_detals[1].to_string();
                 ntry_det.rltd_pties.cdtr_acct.other.id = debit_detals[0].to_string();
             }
-            ntry_det.rltd_agts.cdtr_agt
+            DocumentCsv::extract_crd_agent(&row.r, & mut ntry_det);
+            ntry_det.rmt_inf.ustrd = row.u.to_string();
             ntry.ntry_dtls.btch.tx_dtls.push(ntry_det);
-
-
-
-          //  camt.add_transaction(row);
         }
+        let next_row = self.rows.len() - 4; //offset balance data from end document
+        let mut balance_opbd = BalanceAttribute::default();
+        balance_opbd.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
+        balance_opbd.tp.cd_or_party.cd = "OPDB".to_string();
+        balance_opbd.amt = self.rows[next_row+1].h.to_string();
+        camt_bk_to_cstm.stmt.bal.push(balance_opbd);
+        camt_bk_to_cstm.stmt.txs_summry.ttl_dbt_ntries.sum = self.rows[next_row+2].h.to_string();
+        camt_bk_to_cstm.stmt.txs_summry.ttl_cdt_ntries.sum = self.rows[next_row+2].l.to_string();
+        camt_bk_to_cstm.stmt.txs_summry.ttl_ntries.nb_of_ntries = self.rows[next_row].l.to_string();
+        let mut balance_clbd = BalanceAttribute::default();
+        balance_clbd.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
+        balance_clbd.tp.cd_or_party.cd = "CLDB".to_string();
+        balance_clbd.amt = self.rows[next_row+3].l.to_string();
+        camt_bk_to_cstm.stmt.bal.push(balance_clbd);
         camt.bk_to_cstm.push(camt_bk_to_cstm);
         Ok(camt)
     }
