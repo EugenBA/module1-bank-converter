@@ -34,8 +34,8 @@ impl DocumentMt940 {
             record_write.push_str("/");
             record_write.push_str(&record.stmt.lgl_seq_nv);
             record_write.push_str("\n");
-            DocumentMt940::mt940_field_6x(&record, &mut record_write);
-            DocumentMt940::mt940_field_61_86(&record.stmt.ntry, &mut record_write);
+            DocumentMt940::extract_field_6x_mt940(&record, &mut record_write);
+            DocumentMt940::extract_field_61_86_mt940(&record.stmt.ntry, &mut record_write);
             record_write.push_str("}\n{5:-}\n");
             writer.write_all(record_write.as_bytes())?;
             writer.flush()?;

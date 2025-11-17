@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct DocumentCamt053 {
     #[serde(rename="@xlmns")]
     xlmns: String,
@@ -15,6 +16,7 @@ pub(crate) struct DocumentCamt053 {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct BkToCstmAttribute{
     pub(crate) grp_hdr: HeaderAttribute,
     pub(crate) stmt: StatementAttribute,
@@ -24,6 +26,7 @@ pub(crate) struct BkToCstmAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct HeaderAttribute{
     pub(crate) msg_id: String, //message id
     pub(crate) crd_dt_tm: String, //datetime create file
@@ -31,12 +34,13 @@ pub(crate) struct HeaderAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate)  struct StatementAttribute{
     pub(crate) id: String, //id
     pub(crate)  electr_seq_nb: String, //ElctrncSeqNb
     pub(crate) lgl_seq_nv: String, //LglSeqNb
     cred_dt_tm: String, //CreDtTm
-    fr_to_dt: FromToDtAttribute, //FrToDt
+    pub(crate) fr_to_dt: FromToDtAttribute, //FrToDt
     pub(crate) acct: AccAttribute, //Acct
     pub(crate) bal: Vec<BalanceAttribute>, //Bal
     txs_summry: TxsSummryAttribute, //TxsSummry
@@ -46,6 +50,7 @@ pub(crate)  struct StatementAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub (crate) struct NtryAttribute{
     ntry_ref: u32, //NtryRef
     pub(crate) amt: String, //Amt
@@ -55,7 +60,7 @@ pub (crate) struct NtryAttribute{
     sts: String, //Sts
     pub(crate) book_dt: DtAttribute, //BookgDt
     pub(crate) val_dt: DtAttribute, //ValDt
-    acct_svrc_ref: String, //AcctSvcrRef
+    pub(crate) acct_svrc_ref: String, //AcctSvcrRef
     pub(crate) bx_tx_cd: BxTxCdAttribute, //BkTxCd
     pub(crate) ntry_dtls: NtryDtlsAttribute//NtryDtls
 
@@ -63,17 +68,20 @@ pub (crate) struct NtryAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct NtryDtlsAttribute{
     pub(crate) btch: BtchAttribute, //Btch
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct BtchAttribute{
     nb_of_txs: u32, //NbOfTxs
    pub(crate) tx_dtls: Vec<TxDtlsAttribute>//TxDtls
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct TxDtlsAttribute {
     pub(crate) refs: EndToEndIdAttribute, //Refs
     pub(crate) amt_dtls: TxAmtAttribute, //AmtDtls
@@ -87,18 +95,22 @@ pub(crate) struct TxDtlsAttribute {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct CdtrAgtAttribute{
     pub(crate) cdtr_agt: FinInstIdAttribute,
+    pub(crate) dbtr_agt: FinInstIdAttribute,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct EndToEndIdAttribute{
     pub(crate) end_to_end_id: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct TxAmtAttribute{
     pub(crate) end_to_end_id: String,
     pub(crate) amt: String,
@@ -106,6 +118,7 @@ pub(crate) struct TxAmtAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct RltdPtiesAttribute{
     pub(crate) cdtr_acct: IdTxDtlsAttribute,
     pub(crate) dbtr_acct: IdTxDtlsAttribute,
@@ -115,24 +128,30 @@ pub(crate) struct RltdPtiesAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct DbtrAttribute{
-    pub(crate) id: PrvtIdAttribute
+    pub(crate) id: PrvtIdAttribute,
+    pub(crate) nm: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct PrvtIdAttribute {
     pub(crate) othr: IdDtldAttribute
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct CdtrAttribue{
+    pub(crate) id: PrvtIdAttribute,
     pub(crate) nm: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct RmtInfAttribute{
     strd: CdtrRefInfAttribute,
     pub(crate) ustrd: String
@@ -140,12 +159,14 @@ pub(crate) struct RmtInfAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct RltdDtsAttribute{
     pub(crate) accpt_nc_dt_tm: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct CdtrRefInfAttribute{
     tp: CdOrPrtryAttribute,//Tp
     ref_cdtr: String //Ref
@@ -153,12 +174,14 @@ struct CdtrRefInfAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct CdOrPrtryAttribute{
     cd_or_prty: CdAttribute//CdOrPrtry
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct IdTxDtlsAttribute{
     id: String, //Id
     pub(crate) other: IdDtldAttribute//Other
@@ -166,12 +189,14 @@ pub(crate) struct IdTxDtlsAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct IdDtldAttribute{
     pub(crate) id: String
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct AmtAttribute{
     #[serde(rename="@Ccy")]
     ccy: String//Ccy
@@ -179,6 +204,7 @@ struct AmtAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct BxTxCdAttribute{
     domn: DomnAttribute, //Domn
     pub(crate) prtry: PrtryAttribute//Prtry
@@ -186,6 +212,7 @@ pub(crate) struct BxTxCdAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct DomnAttribute{
     cd: String, //Cd
     fmly: FmlyAttribute, //Fmly
@@ -193,6 +220,7 @@ struct DomnAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct FmlyAttribute{
     cd: String, //Cd
     sub_fmly_cd: String//SubFmlyCd
@@ -200,13 +228,15 @@ struct FmlyAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct PrtryAttribute{
     pub(crate) cd: String, //cd
-    issr: String//Issr
+    pub(crate) issr: String//Issr
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct TxsSummryAttribute{
     ttl_ntries: TtlNtriesAttribute, //TtlNtries
     ttl_cdt_ntries: TtlCdtDbtNtriesAttribute,//TtlCdtNtries
@@ -216,6 +246,7 @@ struct TxsSummryAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct TtlNtriesAttribute{
     nb_of_ntries: u32, //NbOfNtries
     ttl_net_ntry_amt: f64,//TtlNetNtryAmt
@@ -225,6 +256,7 @@ struct TtlNtriesAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct TtlCdtDbtNtriesAttribute{
     nb_of_ntries: u32, //NbOfNtries
     sum: f64, //Sum
@@ -232,6 +264,7 @@ struct TtlCdtDbtNtriesAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct BalanceAttribute{
     pub(crate) tp: TpBalanceAttribute, // tp
     pub(crate) amt: String,
@@ -243,31 +276,36 @@ pub(crate) struct BalanceAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct DtAttribute{
     pub(crate) dt: String,
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct TpBalanceAttribute{
     pub(crate) cd_or_party: CdAttribute
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct CdAttribute{
     pub(crate) cd: String,
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct FromToDtAttribute{
-    fr_dt_tm: String, //FrDtTm
-    to_dt_tm: String, //ToDtTm
+#[serde(default)]
+pub(crate) struct FromToDtAttribute{
+    pub(crate) fr_dt_tm: String, //FrDtTm
+    pub(crate) to_dt_tm: String, //ToDtTm
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate)  struct AccAttribute{
     pub(crate) id: IdIbanAttribute, //id
     #[serde(rename="@Ccy")]
-    ccy: String, //Ccy
+    pub(crate) ccy: String, //Ccy
     nm: String, //nm
     pub(crate) ownr: OwnerAttribute, //ownr
     pub(crate) svcr: SvcrAttribute, //svcr
@@ -276,22 +314,26 @@ pub(crate)  struct AccAttribute{
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct IdIbanAttribute{
     iban: String, //IBAN
     pub(crate) othr: OtherAttribute,
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate)  struct SvcrAttribute{
     pub(crate) fin_inst_id: FinInstIdAttribute //FinInstnId
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate)  struct FinInstIdAttribute{
     pub(crate) bic: String, //BIC
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct OwnerAttribute{
     pub(crate) nm: String, //nm
     pstl_addr: PostalAddressAttribute, //pstl_addr
@@ -304,27 +346,32 @@ pub(crate) struct OwnerAttribute{
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct IdAttribute{
     pub(crate) org_id: OrgIdAttribute//OrgId
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct OrgIdAttribute{
     pub(crate) othr: OtherAttribute //Othr
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 pub(crate) struct OtherAttribute{
     pub(crate) id: String, //id
     schme_nm: ShemeNumberAttribute //SchmeNm
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct ShemeNumberAttribute{
     cd: String, //cd
 }
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+#[serde(default)]
 struct PostalAddressAttribute{
     strt_nm: String, //strt_nm
 
@@ -512,8 +559,12 @@ impl TxDtlsAttribute {
                     id: "".to_string(),
                     other: IdDtldAttribute { id: "".to_string() }
                 },
-                cdtr: CdtrAttribue { nm: "".to_string() },
-                dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } } },
+                cdtr: CdtrAttribue { id: PrvtIdAttribute { othr: IdDtldAttribute {
+                    id: "".to_string() } },
+                    nm: "".to_string() },
+                dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute {
+                    id: "".to_string() } },
+                    nm: "".to_string() },
             },
             rmt_inf: RmtInfAttribute {
                 strd: CdtrRefInfAttribute {

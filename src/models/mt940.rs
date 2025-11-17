@@ -4,7 +4,7 @@ pub(crate) struct DocumentMt940 {
 }
 
 impl DocumentMt940 {
-    pub(crate) fn mt940_field_6x(record_camt: &BkToCstmAttribute, record_write: &mut String) {
+    pub(crate) fn extract_field_6x_mt940(record_camt: &BkToCstmAttribute, record_write: &mut String) {
         for balance in &record_camt.stmt.bal {
             match balance.tp.cd_or_party.cd.as_ref() {
                 "OPBD" => { record_write.push_str(":60F:") },
@@ -25,7 +25,7 @@ impl DocumentMt940 {
         }
     }
 
-    pub(crate) fn mt940_field_61_86(record_camt: &Vec<NtryAttribute>, record_write: &mut String) {
+    pub(crate) fn extract_field_61_86_mt940(record_camt: &Vec<NtryAttribute>, record_write: &mut String) {
         for ntry in record_camt {
             record_write.push_str(":61:");
             let mut dt = ntry.val_dt.dt.replace("-", "");
