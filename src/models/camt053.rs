@@ -174,9 +174,10 @@ pub(crate) struct IdDtldAttribute{
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(rename_all = "PascalCase", default)]
-struct AmtAttribute{
+pub(crate) struct AmtAttribute{
     #[serde(rename="@Ccy")]
-    ccy: String//Ccy
+    pub(crate) ccy: String,//Ccy
+    pub(crate) amt: String
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -236,9 +237,7 @@ pub(crate) struct TtlCdtDbtNtriesAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct BalanceAttribute{
     pub(crate) tp: TpBalanceAttribute, // tp
-    pub(crate) amt: String,
-    #[serde(rename="@Ccy")]
-    pub(crate) ccy: String,
+    pub(crate) amt: AmtAttribute,
     pub(crate) dt:  DtAttribute,
     #[serde(skip_serializing)]
     pub(crate) cd: String

@@ -20,8 +20,8 @@ impl DocumentMt940 {
             if dt.len() >= 10 {
                 record_write.push_str(&dt[2..10]);
             }
-            record_write.push_str(balance.ccy.as_ref());
-            record_write.push_str(balance.amt.replace(".", ",").as_ref());
+            record_write.push_str(balance.amt.ccy.as_ref());
+            record_write.push_str(balance.amt.amt.replace(".", ",").as_ref());
             record_write.push_str("\n");
         }
     }

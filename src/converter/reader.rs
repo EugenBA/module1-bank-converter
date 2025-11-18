@@ -65,8 +65,8 @@ impl DocumentMt940 {
             if let Some(capture) = regex.captures(header) {
                 let mut balance = BalanceAttribute::default();
                 balance.dt= DtAttribute::format_dt(&capture[2]);
-                balance.ccy = capture[3].to_string();
-                balance.amt = capture[4].replace(",", ".").to_string();
+                balance.amt.ccy = capture[3].to_string();
+                balance.amt.amt = capture[4].replace(",", ".").to_string();
                 balance.cd = capture[1].to_string();
                 return Some(balance);
             }
@@ -211,7 +211,7 @@ impl DocumentMt940 {
             }
         }
         if let Some(ntry) = DocumentMt940::parse_field_ntry(&header,
-                                                            &document.stmt.bal[0].ccy){
+                                                            &document.stmt.bal[0].amt.ccy){
             document.stmt.ntry = ntry;
         }//todo: replace this only test
     }

@@ -166,17 +166,17 @@ impl DocumentCsv {
         }
         let next_row = self.rows.len() - 4; //offset balance data from end document
         let mut balance_opbd = BalanceAttribute::default();
-        balance_opbd.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
+        balance_opbd.amt.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
         balance_opbd.tp.cd_or_party.cd = "OPDB".to_string();
-        balance_opbd.amt = self.rows[next_row+1].h.to_string();
+        balance_opbd.amt.amt = self.rows[next_row+1].h.to_string();
         camt_bk_to_cstm.stmt.bal.push(balance_opbd);
         camt_bk_to_cstm.stmt.txs_summry.ttl_dbt_ntries.sum = self.rows[next_row+2].h.to_string();
         camt_bk_to_cstm.stmt.txs_summry.ttl_cdt_ntries.sum = self.rows[next_row+2].l.to_string();
         camt_bk_to_cstm.stmt.txs_summry.ttl_ntries.nb_of_ntries = self.rows[next_row].l.to_string();
         let mut balance_clbd = BalanceAttribute::default();
-        balance_clbd.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
+        balance_clbd.amt.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
         balance_clbd.tp.cd_or_party.cd = "CLDB".to_string();
-        balance_clbd.amt = self.rows[next_row+3].l.to_string();
+        balance_clbd.amt.amt = self.rows[next_row+3].l.to_string();
         camt_bk_to_cstm.stmt.bal.push(balance_clbd);
         camt.bk_to_cstm.push(camt_bk_to_cstm);
         Ok(camt)
