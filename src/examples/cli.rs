@@ -30,10 +30,10 @@ struct PipelineConverter{
 impl  PipelineConverter {
     pub fn get_format_type_from_string(format_str: &String) -> FormatType {
         match format_str.to_lowercase().as_str() {
-            "csv" => FormatType::Csv,
-            "xml" => FormatType::Xml,
-            "mt940" => FormatType::Mt940,
-            "camt053" => FormatType::Camt053,
+            "csv" | "CSV" => FormatType::Csv,
+            "xml" | "XML" => FormatType::Xml,
+            "mt940" | "MT940" => FormatType::Mt940,
+            "camt053" | "CAMT053" => FormatType::Camt053,
             _ => FormatType::None
         }
     }
@@ -89,38 +89,38 @@ impl  PipelineConverter {
 fn main() {
     // Получаем аргументы командной строки
     let mut args: Vec<String> = env::args().collect();
-
+    println!("{:?}", args);
     // Если аргументов недостаточно, показываем справку
     if args.len() < 2 {
         eprintln!("Использование:");
         eprintln!("  -i <file name>");
         eprintln!("  -o <file name>");
-        eprintln!("  --in_format CSV|XML|MT940|CAMT.053");
-        eprintln!("  --out_format CSV|XML|MT940|CAMT.053");
+        eprintln!("  --in_format CSV|XML|MT940|CAMT053");
+        eprintln!("  --out_format CSV|XML|MT940|CAMT053");
         return;
     }
     let mut converter = PipelineConverter::default();
     let mut in_file = String::new();
     let mut out_file = String::new();
-    while args.len() > 0 
+    while args.len() > 1
     {
-        match args.remove(0).as_str(){
+        match args.remove(1).as_str(){
             "-i" => {
-                in_file = args.remove(0);
+                in_file = args.remove(1);
             }
             "-o" => {
-                out_file = args.remove(0);
+                out_file = args.remove(1);
             }
             "--in_format" => {
-                let format = args.remove(0);
+                let format = args.remove(1);
                 converter.data_in = PipelineConverter::get_format_type_from_string(&format);
             }
             "--out_format" => {
-                let format = args.remove(0);
+                let format = args.remove(1);
                 converter.data_out = PipelineConverter::get_format_type_from_string(&format);
             }
-            _ => {
-                eprintln!("Неизвестная команда");
+            arg => {
+                eprintln!("Неизвестная команда: {}", arg);
                 return;
             }
         }
@@ -132,9 +132,11 @@ fn main() {
     if converter.data_in == FormatType::None ||
         converter.data_out == FormatType::None {
         eprintln!("Не указаны форматы входного или выходного файла");
+        return;
     }
     if converter.data_in == converter.data_out{
         eprintln!("Выбран один и тот же формат для входного и выходного файлов");
+        return;
     }
     if !Path::new(&in_file).exists() {
         eprintln!("Файл {} не существует", in_file);

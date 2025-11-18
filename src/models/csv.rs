@@ -119,10 +119,10 @@ impl DocumentCsv {
         }
         camt_bk_to_cstm.stmt.acct.id.othr.id = self.rows[4].m.to_string();
         camt_bk_to_cstm.stmt.acct.ownr.nm = self.rows[5].m.to_string();
-        if let Some(dt) = DocumentCsv::convert_ru_month_to_number(&self.rows[6].c) {
+        if let Some(dt) = DocumentCsv::extract_date_rus(&self.rows[6].c) {
             camt_bk_to_cstm.stmt.fr_to_dt.fr_dt_tm = dt + "T00:00:00";
         }
-        if let Some(dt) = DocumentCsv::convert_ru_month_to_number(&self.rows[6].p){
+        if let Some(dt) = DocumentCsv::extract_date_rus(&self.rows[6].p){
             camt_bk_to_cstm.stmt.fr_to_dt.to_dt_tm= dt + "T23:59:59";
         }
         if let Some(ccy) = DocumentCsv::extract_ccy(&self.rows[7].c){

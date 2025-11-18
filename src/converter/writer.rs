@@ -55,35 +55,3 @@ impl DocumentCsv {
         Ok(())
     }
 }
-
-/*
-impl Document {
-    pub(crate) fn to(document: DocumentType, out: OutDataType) -> Result<(), ConvertError> {
-        let mut wr_data = WriteData{ camt_mt: DocumentCamt053::default() };
-
-        match document {
-            DocumentType::DocumentCamt053(camt054) => {
-                wr_data.camt_mt = camt054;
-            },
-            DocumentType::DocumentMt940(mt940) => {
-                wr_data.camt_mt.bk_to_cstm = mt940.document;
-            },
-            DocumentType::DocumentCsv(csv) => {},
-        }
-        if let Some(buff_write) = out.buff_write {
-            match out.format_type {
-                FormatType::None => {}
-                FormatType::Csv => {}
-                FormatType::Mt940 => {
-                    wr_data.to_mt940(buff_write)?;
-                }
-                FormatType::Camt053 | FormatType::Xml => {
-                    wr_data.to_camt053(buff_write)?;
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-*/

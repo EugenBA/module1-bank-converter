@@ -13,3 +13,7 @@ regex = "1.12.2"
 [[example]]
 name = "cli"
 path = "src/examples/cli.rs"
+
+[[test]]
+name = "lib_tests"
+path = "tests/tests.rs"
