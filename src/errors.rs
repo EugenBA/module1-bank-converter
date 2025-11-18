@@ -18,6 +18,7 @@ pub enum ParserError
     FileReadError(String),
     BadInputFormatFile(String),
     BadFormatType(String),
+    BadXmlDeserializeError(String),
     BadCsvDeserializeError(String),
 }
 
@@ -28,13 +29,14 @@ impl Display for ParserError {
             ParserError::BadInputFormatFile(s) => write!(f, "Bad input format file: {}", s),
             ParserError::BadFormatType(s) => write!(f, "Bad format type: {}", s),
             ParserError::BadCsvDeserializeError(s) => write!(f, "Csv format deserialize error: {}", s),
+            ParserError::BadXmlDeserializeError(s) => write!(f, "Xml format deserialize error: {}", s),
         }
     }
 }
 
 impl  From<serde_xml_rs::Error> for ParserError{
     fn from(err: serde_xml_rs::Error) -> Self{
-        ParserError::BadFormatType(err.to_string())
+        ParserError::BadXmlDeserializeError(err.to_string())
     }
 }
 

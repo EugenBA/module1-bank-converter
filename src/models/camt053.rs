@@ -32,11 +32,11 @@ pub(crate) struct HeaderAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate)  struct StatementAttribute{
     pub(crate) id: String, //id
-    pub(crate)  electr_seq_nb: String, //ElctrncSeqNb
+    pub(crate) electr_seq_nb: String, //ElctrncSeqNb
     pub(crate) lgl_seq_nv: String, //LglSeqNb
     cred_dt_tm: String, //CreDtTm
     pub(crate) fr_to_dt: FromToDtAttribute, //FrToDt
-    pub(crate) acct: AccAttribute, //Acct
+    pub(crate) acct: AcctAttribute, //Acct
     pub(crate) bal: Vec<BalanceAttribute>, //Bal
     pub(crate) txs_summry: TxsSummryAttribute, //TxsSummry
     pub(crate) ntry: Vec<NtryAttribute> //Ntry
@@ -266,9 +266,8 @@ pub(crate) struct FromToDtAttribute{
 }
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(rename_all = "PascalCase", default)]
-pub(crate)  struct AccAttribute{
+pub(crate)  struct AcctAttribute {
     pub(crate) id: IdIbanAttribute, //id
-    #[serde(rename="@Ccy")]
     pub(crate) ccy: String, //Ccy
     nm: String, //nm
     pub(crate) ownr: OwnerAttribute, //ownr
