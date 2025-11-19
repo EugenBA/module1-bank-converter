@@ -1,5 +1,6 @@
 use std::{env};
 use std::fs::File;
+use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::Path;
 use bank_converter::errors::{ConvertError};
 use bank_converter::models::camt053::{DocumentCamt053};
@@ -43,7 +44,7 @@ impl  PipelineConverter {
             data_out: FormatType::None
         }
     }
-    fn read_document(&self, r: &mut File) -> Result<Document, ConvertError> {
+    fn read_document<T:Read>(&self, r: &mut T) -> Result<Document, ConvertError> {
         match self.data_in {
             FormatType::None => {
                 Err(ConvertError::BadArgument("Not support input format".to_string()))
@@ -59,7 +60,7 @@ impl  PipelineConverter {
             }
         }
     }
-    fn convert(&self, r: &mut File, w: &mut File) -> Result<(), ConvertError> {
+    fn convert<T:Read, W:Write>(&self, r: &mut T, w: &mut W) -> Result<(), ConvertError> {
         let document = self.read_document(r)?;
         let mut camt = match document {
             Document::DocumentCamt053(doc) => doc,
@@ -142,8 +143,8 @@ fn main() {
         eprintln!("Файл {} не существует", in_file);
         return;
     }
-    let mut reader = File::open(in_file).unwrap();
-    let mut writer = File::create(out_file).unwrap();
+    let mut reader = BufReader::new(File::open(in_file).unwrap());
+    let mut writer = BufWriter::new(File::create(out_file).unwrap());
     if let Err(e) = converter.convert(&mut reader, &mut writer){
         eprintln!("{}", e);
     }
