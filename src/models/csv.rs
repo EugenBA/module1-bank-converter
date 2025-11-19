@@ -3,7 +3,7 @@ use serde::Serialize;
 use serde::Deserialize;
 use crate::csv_data;
 use crate::errors::ParserError;
-use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053,
+use crate::models::camt053::{BalanceAttribute, BkToCstmrStmt, DocumentCamt053,
                              NtryAttribute, TxDtlsAttribute};
 
 pub struct DocumentCsv {
@@ -106,7 +106,7 @@ impl DocumentCsv {
 
     pub(crate) fn parse_to_camt(self) -> Result<DocumentCamt053, ParserError>{
         let mut camt = DocumentCamt053::new();
-        let mut camt_bk_to_cstm = BkToCstmAttribute::default();
+        let mut camt_bk_to_cstm = BkToCstmrStmt::default();
         if self.rows.len() < 8 {
             return Err(ParserError::BadInputFormatFile("Bad input csv file".to_string()))
         }
@@ -178,7 +178,7 @@ impl DocumentCsv {
         balance_clbd.tp.cd_or_party.cd = "CLDB".to_string();
         balance_clbd.amt.amt = self.rows[next_row+3].l.to_string();
         camt_bk_to_cstm.stmt.bal.push(balance_clbd);
-        camt.bk_to_cstm.push(camt_bk_to_cstm);
+        camt.bk_to_cstmr_stmt.push(camt_bk_to_cstm);
         Ok(camt)
     }
 

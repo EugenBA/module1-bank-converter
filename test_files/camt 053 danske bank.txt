@@ -1,5 +1,5 @@
 
-<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd">
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd">
 
 <!-- Danske Bank CAMT053 example file for Denmark -->
 
@@ -117,7 +117,7 @@
 
 </Tp>
 
-<Amt Ccy="DKK">12345.67</Amt>
+<Amt Ccy="DKK">12345.67</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -141,7 +141,7 @@
 
 </Tp>
 
-<Amt Ccy="DKK">23456.78</Amt>
+<Amt Ccy="DKK">23456.78</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -165,7 +165,7 @@
 
 </Tp>
 
-<Amt Ccy="DKK">12345.67</Amt>
+<Amt Ccy="DKK">12345.67</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -189,7 +189,7 @@
 
 </Tp>
 
-<Amt Ccy="DKK">23456.78</Amt>
+<Amt Ccy="DKK">23456.78</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -213,7 +213,7 @@
 
 </Tp>
 
-<Amt Ccy="DKK">12345.67</Amt>
+<Amt Ccy="DKK">12345.67</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -261,7 +261,7 @@
 
 <NtryRef>1</NtryRef>
 
-<Amt Ccy="DKK">591.15</Amt>
+<Amt Ccy="DKK">591.15</Amt>
 
 <CdtDbtInd>CRDT</CdtDbtInd>
 
@@ -341,7 +341,7 @@
 
 <InstdAmt>
 
-<Amt Ccy="DKK">591.15</Amt>
+<Amt Ccy="DKK">591.15</Amt>
 
 </InstdAmt>
 
@@ -349,7 +349,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">591.15</Amt>
+<Amt Ccy="DKK">591.15</Amt>
 
 </TxAmt>
 
@@ -359,7 +359,7 @@
 
 <Tp>IBS</Tp>
 
-<Amt Ccy="DKK">591.15</Amt>
+<Amt Ccy="DKK">591.15</Amt>
 
 </PrtryAmt>
 
@@ -465,7 +465,7 @@
 
 <NtryRef>2</NtryRef>
 
-<Amt Ccy="DKK">1101.88</Amt>
+<Amt Ccy="DKK">1101.88</Amt>
 
 <CdtDbtInd>CRDT</CdtDbtInd>
 
@@ -539,7 +539,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">528.94</Amt>
+<Amt Ccy="DKK">528.94</Amt>
 
 </TxAmt>
 
@@ -625,7 +625,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">572.94</Amt>
+<Amt Ccy="DKK">572.94</Amt>
 
 </TxAmt>
 
@@ -707,7 +707,7 @@
 
 <NtryRef>3</NtryRef>
 
-<Amt Ccy="DKK">150.86</Amt>
+<Amt Ccy="DKK">150.86</Amt>
 
 <CdtDbtInd>CRDT</CdtDbtInd>
 
@@ -781,7 +781,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">150.86</Amt>
+<Amt Ccy="DKK">150.86</Amt>
 
 </TxAmt>
 
@@ -853,7 +853,7 @@
 
 <NtryRef>4</NtryRef>
 
-<Amt Ccy="DKK">344278.01</Amt>
+<Amt Ccy="DKK">344278.01</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -941,7 +941,7 @@
 
 <InstdAmt>
 
-<Amt Ccy="EUR">46064.52</Amt>
+<Amt Ccy="EUR">46064.52</Amt>
 
 </InstdAmt>
 
@@ -949,7 +949,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">344278.01</Amt>
+<Amt Ccy="DKK">344278.01</Amt>
 
 <CcyXchg>
 
@@ -1051,7 +1051,7 @@
 
 <NtryRef>5</NtryRef>
 
-<Amt Ccy="DKK">1320.00</Amt>
+<Amt Ccy="DKK">1320.00</Amt>
 
 <CdtDbtInd>CRDT</CdtDbtInd>
 
@@ -1117,7 +1117,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">1320.00</Amt>
+<Amt Ccy="DKK">1320.00</Amt>
 
 </TxAmt>
 
@@ -1141,7 +1141,7 @@
 
 <NtryRef>6</NtryRef>
 
-<Amt Ccy="DKK">2060.00</Amt>
+<Amt Ccy="DKK">2060.00</Amt>
 
 <CdtDbtInd>DBIT</CdtDbtInd>
 
@@ -1215,7 +1215,7 @@
 
 <TxAmt>
 
-<Amt Ccy="DKK">2060.00</Amt>
+<Amt Ccy="DKK">2060.00</Amt>
 
 </TxAmt>
 

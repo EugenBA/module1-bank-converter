@@ -1,11 +1,11 @@
-use crate::models::camt053::{BkToCstmAttribute, NtryAttribute};
+use crate::models::camt053::{BkToCstmrStmt, NtryAttribute};
 
 pub struct DocumentMt940 {
-    pub(crate) document: Vec<BkToCstmAttribute>
+    pub(crate) document: Vec<BkToCstmrStmt>
 }
 
 impl DocumentMt940 {
-    pub(crate) fn extract_field_6x_mt940(record_camt: &BkToCstmAttribute, record_write: &mut String) {
+    pub(crate) fn extract_field_6x_mt940(record_camt: &BkToCstmrStmt, record_write: &mut String) {
         for balance in &record_camt.stmt.bal {
             match balance.tp.cd_or_party.cd.as_ref() {
                 "OPBD" => { record_write.push_str(":60F:") },

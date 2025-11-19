@@ -1,6 +1,6 @@
 use std::io::{Read};
 use crate::errors::ParserError;
-use crate::models::camt053::{BalanceAttribute, BkToCstmAttribute, DocumentCamt053,
+use crate::models::camt053::{BalanceAttribute, BkToCstmrStmt, DocumentCamt053,
                              DtAttribute, NtryAttribute, NtryDtlsAttribute, TxDtlsAttribute};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
@@ -49,7 +49,7 @@ impl DocumentMt940 {
         }
     }
 
-    fn parse_field_two(header: &str, document: &mut BkToCstmAttribute) {
+    fn parse_field_two(header: &str, document: &mut BkToCstmrStmt) {
         let regex = Regex::new(r"([IO])(\d{3})(.*?)");
         if let Ok(regex) = regex {
             if let Some(capture) = regex.captures(header) {
@@ -163,7 +163,7 @@ impl DocumentMt940 {
         Some(nxtry)
     }
 
-    fn parse_field_foo(header: &str, document: &mut BkToCstmAttribute) {
+    fn parse_field_foo(header: &str, document: &mut BkToCstmrStmt) {
         let reg_codes = ["26", "25", "28C", "60F", "62F", "62M", "64", "65"];
         for reg_code in reg_codes.iter() {
             let reg_pattern = Regex::new(&format!(r":{}:([\n\w\d ,/-]+):",
@@ -216,8 +216,8 @@ impl DocumentMt940 {
         }//todo: replace this only test
     }
 
-    fn parse_one_record(document: &str) -> Option<BkToCstmAttribute> {
-        let mut record: BkToCstmAttribute = BkToCstmAttribute::default();
+    fn parse_one_record(document: &str) -> Option<BkToCstmrStmt> {
+        let mut record: BkToCstmrStmt = BkToCstmrStmt::default();
         for field in 1..6 {
             let reg_pattern = Regex::new(&format!(r"\{{{}:[\n\w\d ,/:-]*\}}",
                                                   field));

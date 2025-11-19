@@ -92,7 +92,7 @@ fn main() {
     let mut args: Vec<String> = env::args().collect();
     println!("{:?}", args);
     // Если аргументов недостаточно, показываем справку
-    if args.len() < 2 {
+    if args.len() < 1 {
         eprintln!("Использование:");
         eprintln!("  -i <file name>");
         eprintln!("  -o <file name>");
@@ -103,6 +103,14 @@ fn main() {
     let mut converter = PipelineConverter::default();
     let mut in_file = String::new();
     let mut out_file = String::new();
+    args.push(String::from("-i"));
+    args.push(String::from("/mnt/ssd_data/RustProject/bank-converter/test_files/camt 053 danske bank.txt"));
+    args.push(String::from("-o"));
+    args.push(String::from("/mnt/ssd_data/RustProject/bank-converter/test_files/MT940.txt"));
+    args.push(String::from("--in_format"));
+    args.push(String::from("CAMT053"));
+    args.push(String::from("--out_format"));
+    args.push(String::from("MT940"));
     while args.len() > 1
     {
         match args.remove(1).as_str(){
@@ -147,6 +155,7 @@ fn main() {
     let mut writer = BufWriter::new(File::create(out_file).unwrap());
     if let Err(e) = converter.convert(&mut reader, &mut writer){
         eprintln!("{}", e);
+        return;
     }
     print!("Конвертация успешна!")
 }

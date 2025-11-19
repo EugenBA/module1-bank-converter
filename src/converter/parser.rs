@@ -5,7 +5,7 @@ use crate::models::mt940::DocumentMt940;
 impl From<DocumentCamt053>  for DocumentMt940 {
     fn from(camt053: DocumentCamt053) -> Self {
         Self {
-            document: camt053.bk_to_cstm
+            document: camt053.bk_to_cstmr_stmt
         }
     }
 }
@@ -23,7 +23,7 @@ impl From<DocumentCsv> for DocumentMt940 {
 impl From<DocumentMt940> for DocumentCamt053 {
     fn from(mt940: DocumentMt940) -> Self {
         let mut camt = Self::default();
-        camt.bk_to_cstm = mt940.document;
+        camt.bk_to_cstmr_stmt = mt940.document;
         camt
     }
 }

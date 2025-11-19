@@ -9,12 +9,12 @@ pub struct DocumentCamt053 {
     xmlns_xsi: String,
     #[serde(rename="@xsi:schemaLocation")]
     xsi_schema_location: String,
-    pub(crate) bk_to_cstm: Vec<BkToCstmAttribute>
+    pub(crate) bk_to_cstmr_stmt: Vec<BkToCstmrStmt>
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(rename_all = "PascalCase", default)]
-pub(crate) struct BkToCstmAttribute{
+pub(crate) struct BkToCstmrStmt {
     pub(crate) grp_hdr: HeaderAttribute,
     pub(crate) stmt: StatementAttribute,
     #[serde(skip_serializing)]
@@ -275,9 +275,11 @@ pub(crate)  struct AcctAttribute {
 
 }
 #[derive(Debug, Deserialize, Serialize, Default)]
-#[serde(rename_all = "PascalCase", default)]
+#[serde(default)]
 pub(crate) struct IdIbanAttribute{
+    #[serde(rename="IBAN")]
     iban: String, //IBAN
+    #[serde(rename="PascalCase:Othr")]
     pub(crate) othr: OtherAttribute,
 }
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -337,7 +339,7 @@ impl Default for DocumentCamt053{
             xlmns: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02".to_string(),
             xmlns_xsi: "http://www.w3.org/2001/XMLSchema-instance".to_string(),
             xsi_schema_location: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd".to_string(),
-            bk_to_cstm: Vec::new()
+            bk_to_cstmr_stmt: Vec::new()
         }
     }
 }
