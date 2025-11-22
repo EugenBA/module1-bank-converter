@@ -18,7 +18,7 @@ impl DocumentMt940 {
         let mut record_write = String::new();
         for record in &self.document {
             record_write.push_str("{1:F01");
-            record_write.push_str(&record.stmt.acct.svcr.fin_inst_id.bic);
+            record_write.push_str(&record.stmt.acct.svcr.fin_instn_id.bic);
             record_write.push_str("}\n");
             record_write.push_str("{2:");
             record_write.push_str(&record.grp_hdr.msg_id);
@@ -30,7 +30,7 @@ impl DocumentMt940 {
             record_write.push_str(&record.stmt.acct.ownr.id.org_id.othr.id);
             record_write.push_str("\n");
             record_write.push_str(":28C:");
-            record_write.push_str(&record.stmt.electr_seq_nb);
+            record_write.push_str(&record.stmt.elctrnc_seq_nb);
             record_write.push_str("/");
             record_write.push_str(&record.stmt.lgl_seq_nv);
             record_write.push_str("\n");

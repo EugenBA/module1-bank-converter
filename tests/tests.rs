@@ -10,11 +10,14 @@ mod tests{
                         <!-- Balances in the file does not match the transactions booked -->
                        <!-- Payment types included: 4 credits and 2 debits -->
                        <BkToCstmrStmt></BkToCstmrStmt></Document>"#;
-        if let Ok(camt054) = DocumentCamt053::from_read(&mut doc.as_bytes()){
-            let camt_def = DocumentCamt053::default();
-          //  assert_eq!(camt054, camt_def);
+        match DocumentCamt053::from_read(&mut doc.as_bytes())
+        {
+            Ok(camt053) => {
+                let camt_def = DocumentCamt053::default();
+                assert_eq!(camt053, camt_def);
+            },
+            Err(e) => assert!(false, "Test failed to parse CAMT053 XML: {}", e)
         }
-
     }
 
 }

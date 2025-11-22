@@ -33,7 +33,7 @@ impl DocumentMt940 {
             if dt.len() >= 10 {
                 record_write.push_str(&dt[2..10]);
             }
-            dt = ntry.book_dt.dt.replace("-", "");
+            dt = ntry.bookg_dt.dt.replace("-", "");
             if dt.len() >= 10 {
                 record_write.push_str(&dt[4..10]);
             }

@@ -111,10 +111,10 @@ impl DocumentCsv {
             return Err(ParserError::BadInputFormatFile("Bad input csv file".to_string()))
         }
         if let Some(date_create) = DocumentCsv::extract_date_create(&self.rows[3].b){
-            camt_bk_to_cstm.grp_hdr.crd_dt_tm = date_create;
+            camt_bk_to_cstm.grp_hdr.cre_dt_tm = date_create;
             if let Some(time_create) = DocumentCsv::extract_time_create(&self.rows[3].b){
-                camt_bk_to_cstm.grp_hdr.crd_dt_tm.push_str("T");
-                camt_bk_to_cstm.grp_hdr.crd_dt_tm.push_str(&time_create);
+                camt_bk_to_cstm.grp_hdr.cre_dt_tm.push_str("T");
+                camt_bk_to_cstm.grp_hdr.cre_dt_tm.push_str(&time_create);
             }
         }
         camt_bk_to_cstm.stmt.acct.id.othr.id = self.rows[4].m.to_string();
@@ -146,7 +146,7 @@ impl DocumentCsv {
             }
             ntry.bx_tx_cd.prtry.cd = row.q.to_string();
             ntry.bx_tx_cd.prtry.issr = self.rows[2].b.to_string();
-            ntry.acct_svrc_ref = row.o.to_string();
+            ntry.acct_svcr_ref = row.o.to_string();
             ntry_det.refs.end_to_end_id ="1".to_string();
             let debit_detals: Vec<&str> = row.e.split("\n").collect();
             if debit_detals.len() == 3{

@@ -79,7 +79,7 @@ impl DocumentMt940 {
             if let Some(capture) = regex.captures(field) {
                 ntry.val_dt = DtAttribute::format_dt(&capture[1]);
                 let dt =  capture[1][0 .. 2].to_string() + &capture[2][0..4].to_string();
-                ntry.book_dt = DtAttribute::format_dt(&dt);
+                ntry.bookg_dt = DtAttribute::format_dt(&dt);
                 ntry.bx_tx_cd.prtry.cd = capture[5].to_string();
                 ntry.amt = capture[4].replace(",", ".").to_string();
                 ntry.ccy = vault.to_string();
@@ -181,7 +181,7 @@ impl DocumentMt940 {
                         "28C" => {
                             let fields: Vec<&str> = capture[1].split('/').collect();
                             if fields.len() > 1{
-                                document.stmt.electr_seq_nb = fields[0].to_string();
+                                document.stmt.elctrnc_seq_nb = fields[0].to_string();
                                 document.stmt.lgl_seq_nv = fields[1].to_string();
                             }
                         },
@@ -225,7 +225,7 @@ impl DocumentMt940 {
                 match regexp.captures(document) {
                     Some(capture) => {
                         match field {
-                            1 => { record.stmt.acct.svcr.fin_inst_id.bic =
+                            1 => { record.stmt.acct.svcr.fin_instn_id.bic =
                                 DocumentMt940::parse_field_one(&capture[1].to_string());},
                             2 => {
                                 DocumentMt940::parse_field_two(&capture[1].to_string(),
