@@ -9,6 +9,13 @@ use regex::{Regex};
 
 
 impl DocumentCamt053 {
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
     pub fn new() -> Self {
         DocumentCamt053::default()
     }
@@ -22,6 +29,25 @@ impl DocumentCamt053 {
 }
 
 impl DocumentMt940 {
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
+        let mut regex_pattern = String::new();
+        r.read_to_string(&mut regex_pattern)?;
+        if let Some(records) = DocumentMt940::find_record(&regex_pattern) {
+            for record in records {
+                DocumentMt940::parse_one_record(&regex_pattern[record.0..record.1]);
+            }
+        }
+        Err(ParserError::BadInputFormatFile("No implement parse document".to_string()))
+    }
 
     fn find_record(document: &str) -> Option<Vec<(usize, usize)>> {
         let mut vec_start_pattern: Vec<usize> = Vec::new();
@@ -243,16 +269,7 @@ impl DocumentMt940 {
         Some(record)
     }
 
-    pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
-        let mut regex_pattern = String::new();
-        r.read_to_string(&mut regex_pattern)?;
-        if let Some(records) = DocumentMt940::find_record(&regex_pattern) {
-            for record in records {
-                DocumentMt940::parse_one_record(&regex_pattern[record.0..record.1]);
-            }
-        }
-        Err(ParserError::BadInputFormatFile("No implement parse document".to_string()))
-    }
+
 }
 
 impl DocumentCsv {
