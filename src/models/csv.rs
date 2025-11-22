@@ -5,6 +5,7 @@ use crate::csv_data;
 use crate::errors::ParserError;
 use crate::models::camt053::{BalanceAttribute, BkToCstmrStmt, DocumentCamt053,
                              NtryAttribute, TxDtlsAttribute};
+use chrono::{Local};
 
 pub struct DocumentCsv {
     pub(crate) rows: Vec<RowCsv>
@@ -17,7 +18,7 @@ impl DocumentCsv {
         Self{rows: Vec::new()}
     }
 
-    fn extract_time_create(val: &str) -> Option<String>{
+    fn extract_time(val: &str) -> Option<String>{
         let reg_pattern = Regex::new(r"(\d{2}:\d{2}:\d{2})");
         if let Ok(regexp) = reg_pattern {
             if let Some(capture) = regexp.captures(val)
@@ -28,7 +29,7 @@ impl DocumentCsv {
         }
         None
     }
-    fn extract_date_create(val: &str) -> Option<String> {
+    fn extract_date(val: &str) -> Option<String> {
         let reg_pattern = Regex::new(r"(\d{2}.\d{2}.\d{4})");
         if let Ok(regexp) = reg_pattern {
             if let Some(capture) = regexp.captures(val)
@@ -110,9 +111,9 @@ impl DocumentCsv {
         if self.rows.len() < 8 {
             return Err(ParserError::BadInputFormatFile("Bad input csv file".to_string()))
         }
-        if let Some(date_create) = DocumentCsv::extract_date_create(&self.rows[3].b){
+        if let Some(date_create) = DocumentCsv::extract_date(&self.rows[3].b){
             camt_bk_to_cstm.grp_hdr.cre_dt_tm = date_create;
-            if let Some(time_create) = DocumentCsv::extract_time_create(&self.rows[3].b){
+            if let Some(time_create) = DocumentCsv::extract_time(&self.rows[3].b){
                 camt_bk_to_cstm.grp_hdr.cre_dt_tm.push_str("T");
                 camt_bk_to_cstm.grp_hdr.cre_dt_tm.push_str(&time_create);
             }
@@ -136,6 +137,10 @@ impl DocumentCsv {
             let mut ntry = NtryAttribute::default();
             let mut ntry_det = TxDtlsAttribute::default();
             ntry.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
+            if let Some(date) = DocumentCsv::extract_date(&row.b){
+                ntry.val_dt.dt = date;
+                ntry.bookg_dt.dt = ntry.val_dt.dt.clone();
+            }
             if row.j.is_empty(){
                 ntry.cdt_dbt_ind = "CDIT".to_string();
                 ntry.amt = row.n.to_string();
@@ -163,6 +168,7 @@ impl DocumentCsv {
             DocumentCsv::extract_crd_agent(&row.r, & mut ntry_det);
             ntry_det.rmt_inf.ustrd = row.u.to_string();
             ntry.ntry_dtls.btch.tx_dtls.push(ntry_det);
+            camt_bk_to_cstm.stmt.ntry.push(ntry);
         }
         let next_row = self.rows.len() - 4; //offset balance data from end document
         let mut balance_opbd = BalanceAttribute::default();
@@ -183,7 +189,99 @@ impl DocumentCsv {
     }
 
     pub(crate)  fn parse_to_csv(camt: &DocumentCamt053) -> Result<Self, ParserError>{
-        let csv = DocumentCsv::new();
-        Ok(csv)
+        if let Some(doc) = camt.bk_to_cstmr_stmt.get(0) {
+            let mut csv = DocumentCsv::new();
+            let mut row_1 = RowCsv::new();
+            row_1.b = format!("Дата формирования выписки: {}", Local::now().format("%d.%m.%Y %H:%M:%S"));
+            csv.rows.push(row_1);
+            let mut row_2 = RowCsv::new();
+            row_2.b = "Выписка по лицевому счету".to_string();
+            row_2.m = doc.stmt.acct.id.othr.id.clone();
+            csv.rows.push(row_2);
+            let mut row_3 = RowCsv::new();
+            row_3.m = doc.stmt.acct.ownr.nm.clone();
+            csv.rows.push(row_3);
+            let mut row_4 = RowCsv::new();
+            row_4.c = format!("За период с {}", doc.stmt.fr_to_dt.fr_dt_tm);
+            row_4.o = "по".to_string();
+            row_4.p = doc.stmt.fr_to_dt.to_dt_tm.clone();
+            csv.rows.push(row_4);
+            let mut row_5 = RowCsv::new();
+            row_5.c = doc.stmt.acct.ccy.clone();
+            csv.rows.push(row_5);
+            let mut row_6 = RowCsv::new();
+            row_6.b = "Дата проводки".to_string();
+            row_6.e = "Счет".to_string();
+            row_6.j = "Сумма по дебету".to_string();
+            row_6.n = "Сумма по кредиту".to_string();
+            row_6.o = "№ документа".to_string();
+            row_6.q = "ВО".to_string();
+            row_6.r = "Банк (БИК и наименование)".to_string();
+            row_6.u = "Назначение платежа".to_string();
+            csv.rows.push(row_6);
+            let mut row_7 = RowCsv::new();
+            row_7.e = "Дебет".to_string();
+            row_7.i = "Кредит".to_string();
+            csv.rows.push(row_7);
+            for ntry in &doc.stmt.ntry{
+                let mut row = RowCsv::new();
+                row.b = ntry.bookg_dt.dt.clone();
+                if ntry.cdt_dbt_ind == "CDIT"{
+                    row.n = ntry.amt.clone();
+                }
+                if ntry.cdt_dbt_ind == "DBIT"{
+                    row.j = ntry.amt.clone();
+                }
+                row.q = ntry.bx_tx_cd.prtry.cd.clone();
+                row.o = ntry.acct_svcr_ref.clone();
+                if let Some(ntry_det) = ntry.ntry_dtls.btch.tx_dtls.get(0)
+                {
+                    row.e = format!("{}\n{}\n{}",
+                                    ntry_det.rltd_pties.dbtr_acct.other.id,
+                                    ntry_det.rltd_pties.dbtr.id.othr.id,
+                                    ntry_det.rltd_pties.dbtr.nm);
+                    row.i = format!("{}\n{}\n{}",
+                                    ntry_det.rltd_pties.cdtr_acct.other.id,
+                                    ntry_det.rltd_pties.cdtr.id.othr.id,
+                                    ntry_det.rltd_pties.cdtr.nm);
+                    row.r = format!("БИК {}, {}",
+                                   ntry_det.rltd_agts.dbtr_agt.bic,
+                                   ntry_det.rltd_agts.dbtr_agt.nm);
+                    row.u = ntry_det.rmt_inf.ustrd.clone();
+                }
+                csv.rows.push(row);
+            }
+            let mut row_8 = RowCsv::new();
+            row_8.b = "б/с".to_string();
+            row_8.h = "Дебет".to_string();
+            row_8.l = "Кредит".to_string();
+            row_8.t = "Всего".to_string();
+            csv.rows.push(row_8);
+            let mut row_9 = RowCsv::new();
+            row_9.b = "Количество операций".to_string();
+            row_9.l = doc.stmt.txs_summry.ttl_ntries.nb_of_ntries.clone();
+            csv.rows.push(row_9);
+            for bal in &doc.stmt.bal{
+                if bal.tp.cd_or_party.cd == "OPDB"{
+                    let mut row = RowCsv::new();
+                    row.b = "Входящий остаток".to_string();
+                    row.h = bal.amt.amt.clone();
+                    csv.rows.push(row);
+                    let mut row_10 = RowCsv::new();
+                    row_10.b = "Итого оборотов".to_string();
+                    row_10.h = doc.stmt.txs_summry.ttl_dbt_ntries.sum.clone();
+                    row_10.l = doc.stmt.txs_summry.ttl_cdt_ntries.sum.clone();
+                    csv.rows.push(row_10);
+                }
+                if bal.tp.cd_or_party.cd == "CLDB" {
+                    let mut row = RowCsv::new();
+                    row.b = "Исходящий остаток".to_string();
+                    row.l = bal.amt.amt.clone();
+                    csv.rows.push(row);
+                }
+            }
+            return Ok(csv);
+        }
+        Err(ParserError::BadCsvDeserializeError("No document to convert CSV format".to_string()))
     }
 }
