@@ -27,7 +27,7 @@ pub(crate)  struct StatementAttribute{
     pub(crate) id: String, //id
     pub(crate) elctrnc_seq_nb: String, //ElctrncSeqNb
     pub(crate) lgl_seq_nv: String, //LglSeqNb
-    cre_dt_tm: String, //CreDtTm
+    pub(crate) cre_dt_tm: String, //CreDtTm
     pub(crate) fr_to_dt: FromToDtAttribute, //FrToDt
     pub(crate) acct: AcctAttribute, //Acct
     pub(crate) bal: Vec<BalanceAttribute>, //Bal

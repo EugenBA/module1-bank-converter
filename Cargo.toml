@@ -14,7 +14,3 @@ chrono = "0.4"
 [[example]]
 name = "cli"
 path = "src/examples/cli.rs"
-
-[[test]]
-name = "lib_tests"
-path = "tests/tests.rs"
