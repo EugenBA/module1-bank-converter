@@ -1,14 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
-#[serde(rename_all = "PascalCase", default)]
+#[serde(rename="Document", default)]
 pub struct DocumentCamt053 {
-    #[serde(rename="@xlmns")]
-    xlmns: String,
-    #[serde(rename="@xlmns:xsi")]
-    xmlns_xsi: String,
-    #[serde(rename="@xsi:schemaLocation")]
-    xsi_schema_location: String,
+    #[serde(rename="BkToCstmrStmt")]
     pub(crate) bk_to_cstmr_stmt: Vec<BkToCstmrStmt>
 }
 
@@ -336,9 +331,6 @@ struct PostalAddressAttribute{
 impl Default for DocumentCamt053{
     fn default() -> Self {
         Self {
-            xlmns: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02".to_string(),
-            xmlns_xsi: "http://www.w3.org/2001/XMLSchema-instance".to_string(),
-            xsi_schema_location: "urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd".to_string(),
             bk_to_cstmr_stmt: Vec::new()
         }
     }

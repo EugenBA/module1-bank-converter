@@ -23,7 +23,21 @@ impl DocumentCamt053 {
     pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
         let mut xml_str = String::new();
         r.read_to_string(&mut xml_str)?;
-        serde_xml_rs::from_str(&xml_str)?
+        if let Some(mut xml_str) = DocumentCamt053::remove_name_space(&xml_str){
+            Ok(serde_xml_rs::from_str(&xml_str)?)
+        }
+        else {
+            Err(ParserError::BadInputFormatFile("Error parse CAMT053 document".to_string()))
+        }
+    }
+
+    fn remove_name_space(xml: &str) -> Option<String>{
+        if let Ok(regexp) = Regex::new(r#"xmlns[= \w/\d:".-]+"#){
+            let result = regexp.replace_all(xml, "");
+            return Some(result.to_string());
+        }
+        None
+
     }
 
 }
