@@ -88,6 +88,15 @@ pub(crate) struct CdtrAgtAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct EndToEndIdAttribute{
     pub(crate) end_to_end_id: String,
+    pub(crate) prtry: PrtryDetAttribute
+}
+
+#[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "PascalCase", default)]
+pub(crate) struct PrtryDetAttribute{
+    pub(crate) tp: String,
+    #[serde(rename="Ref")]
+    pub(crate) refdt: String
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]

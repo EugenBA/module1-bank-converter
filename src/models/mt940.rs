@@ -34,7 +34,7 @@ impl DocumentMt940 {
     }
 
     fn parse_field_two(header: &str, document: &mut BkToCstmrStmt) {
-        let regex = Regex::new(r"([IO])(\d{3})(.*?)");
+        let regex = Regex::new(r"([IO])(\d{3})([\w\d]+)");
         if let Ok(regex) = regex {
             if let Some(capture) = regex.captures(header) {
                 document.grp_hdr.msg_id = capture[3].to_string();
@@ -71,16 +71,14 @@ impl DocumentMt940 {
                     "CRDT".to_string()
                 } else { "DBIT".to_string()};
                 let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
-                DocumentMt940::parse_field_86(field, &mut nxdet);
-                let mut tlds: TxDtlsAttribute = TxDtlsAttribute::default();
-                tlds.refs.end_to_end_id = capture[6].to_string();
-                nxdet.btch.tx_dtls.push(tlds);
+                DocumentMt940::parse_field_86(field, capture[6].to_string(), &mut nxdet);
+                ntry.ntry_dtls = nxdet;
             }
         }
     }
 
-    fn parse_field_86(field: &str, ntrydet: &mut NtryDtlsAttribute) {
-        let reg_pattern = Regex::new(r"/([A-Z]{4})/([^/]*)");
+    fn parse_field_86(field: &str, refs: String, ntrydet: &mut NtryDtlsAttribute) {
+        let reg_pattern = Regex::new(r"/([A-Z]{4})/([\w]*)");
         if let Ok(regexp) = reg_pattern {
             let mut tlds: TxDtlsAttribute = TxDtlsAttribute::default();
             for capture in regexp.captures_iter(field){
@@ -115,9 +113,14 @@ impl DocumentMt940 {
                     "DCID" =>{
                         tlds.rltd_pties.dbtr.id.othr.id = capture[2].to_string();
                     },
+                    "NREF" => {
+                        tlds.refs.prtry.refdt = capture[2].to_string();
+                        tlds.refs.prtry.tp = "NREF".to_string();
+                    },
                     _ => {}
                 }
             }
+            tlds.refs.end_to_end_id = refs;
             ntrydet.btch.tx_dtls.push(tlds);
         }
     }
@@ -354,5 +357,36 @@ mod tests {
                 ntry: vec![],
             },
         });
+    }
+
+    #[test]
+    fn test_parse_field_86() {
+        let doc = ":86:/NREF/NIOBNL56ASNB9999999999\n".to_string();
+        let mut ntry_det_result: NtryDtlsAttribute = NtryDtlsAttribute::default();
+        let mut ntry_det: NtryDtlsAttribute = NtryDtlsAttribute::default();
+        let mut ntry_det_tlds: TxDtlsAttribute = TxDtlsAttribute::default();
+        ntry_det_tlds.refs.prtry.tp = "NREF".to_string();
+        ntry_det_tlds.refs.prtry.refdt = "NIOBNL56ASNB9999999999".to_string();
+        ntry_det.btch.tx_dtls.push(ntry_det_tlds);
+        DocumentMt940::parse_field_86(&doc, "".to_string(), &mut ntry_det_result);
+        assert_eq!(ntry_det_result, ntry_det);
+    }
+    #[test]
+    fn test_parse_field_61() {
+        let doc = ":61:2001050105C1000,00NIOBNL56ASNB9999999999\n:86:/NREF/NIOBNL56ASNB9999999999\n".to_string();
+        let mut ntry_result = NtryAttribute::default();
+        let mut ntry = NtryAttribute::default();
+        ntry.ccy = "EUR".to_string();
+        ntry.val_dt.dt = "2020-01-05".to_string();
+        ntry.bookg_dt.dt = "2020-01-05".to_string();
+        ntry.bx_tx_cd.prtry.cd = "NIOB".to_string();
+        ntry.amt = "1000.00".to_string();
+        ntry.cdt_dbt_ind = "CRDT".to_string();
+        let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
+        let field = ":86:/NREF/NIOBNL56ASNB9999999999\n";
+        DocumentMt940::parse_field_86(field, "NL56ASNB9999999999".to_string(), &mut nxdet);
+        ntry.ntry_dtls = nxdet;
+        DocumentMt940::parse_field_61(&doc, "EUR", &mut ntry_result);
+        assert_eq!(ntry, ntry_result);
     }
 }
