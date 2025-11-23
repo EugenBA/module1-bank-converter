@@ -39,12 +39,12 @@ pub(crate)  struct StatementAttribute{
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub (crate) struct NtryAttribute{
-    ntry_ref: u32, //NtryRef
+    pub(crate) ntry_ref: u32, //NtryRef
     pub(crate) amt: String, //Amt
     #[serde(rename="@Ccy")]
     pub(crate) ccy: String, //Ccy
     pub(crate) cdt_dbt_ind: String, //CdtDbtInd
-    sts: String, //Sts
+    pub(crate) sts: String, //Sts
     pub(crate) bookg_dt: DtAttribute, //BookgDt
     pub(crate) val_dt: DtAttribute, //ValDt
     pub(crate) acct_svcr_ref: String, //AcctSvcrRef
@@ -61,7 +61,7 @@ pub(crate) struct NtryDtlsAttribute{
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct BtchAttribute{
-    nb_of_txs: u32, //NbOfTxs
+    pub(crate) nb_of_txs: u32, //NbOfTxs
    pub(crate) tx_dtls: Vec<TxDtlsAttribute>//TxDtls
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
@@ -69,10 +69,10 @@ pub(crate) struct BtchAttribute{
 pub(crate) struct TxDtlsAttribute {
     pub(crate) refs: EndToEndIdAttribute, //Refs
     pub(crate) amt_dtls: TxAmtAttribute, //AmtDtls
-    bx_tx_cd: BxTxCdAttribute, //BxTxCd
+    pub(crate) bx_tx_cd: BxTxCdAttribute, //BxTxCd
     pub(crate) rltd_pties: RltdPtiesAttribute, //RltdPties
     pub(crate) rmt_inf: RmtInfAttribute, //RmtInf
-    rltd_dts: RltdDtsAttribute, //RltdDts
+    pub(crate) rltd_dts: RltdDtsAttribute, //RltdDts
     pub(crate) rltd_agts: CdtrAgtAttribute, //RltdAgts
     pub(crate) addtl_tx_inf: String, //AddtlTxInf
 }
@@ -138,7 +138,7 @@ pub(crate) struct CdtrAttribue{
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct RmtInfAttribute{
-    strd: CdtrRefInfAttribute,
+    pub(crate) strd: CdtrRefInfAttribute,
     pub(crate) ustrd: String
 }
 
@@ -150,21 +150,21 @@ pub(crate) struct RltdDtsAttribute{
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
-struct CdtrRefInfAttribute{
-    tp: CdOrPrtryAttribute,//Tp
-    ref_cdtr: String //Ref
+pub(crate) struct CdtrRefInfAttribute{
+    pub(crate) tp: CdOrPrtryAttribute,//Tp
+    pub(crate) ref_cdtr: String //Ref
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
-struct CdOrPrtryAttribute{
-    cd_or_prtry: CdAttribute//CdOrPrtry
+pub(crate) struct CdOrPrtryAttribute{
+    pub(crate) cd_or_prtry: CdAttribute//CdOrPrtry
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct IdTxDtlsAttribute{
-    id: String, //Id
+    pub(crate) id: String, //Id
     pub(crate) other: IdDtldAttribute//Other
 }
 
@@ -185,22 +185,22 @@ pub(crate) struct AmtAttribute{
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct BxTxCdAttribute{
-    domn: DomnAttribute, //Domn
+    pub(crate) domn: DomnAttribute, //Domn
     pub(crate) prtry: PrtryAttribute//Prtry
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
-struct DomnAttribute{
-    cd: String, //Cd
-    fmly: FmlyAttribute, //Fmly
+pub(crate) struct DomnAttribute{
+    pub(crate) cd: String, //Cd
+    pub(crate) fmly: FmlyAttribute, //Fmly
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
-struct FmlyAttribute{
-    cd: String, //Cd
-    sub_fmly_cd: String//SubFmlyCd
+pub(crate) struct FmlyAttribute{
+    pub(crate) cd: String, //Cd
+    pub(crate) sub_fmly_cd: String//SubFmlyCd
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
@@ -223,8 +223,8 @@ pub(crate) struct TxsSummryAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct TtlNtriesAttribute{
     pub(crate) nb_of_ntries: String, //NbOfNtries
-    ttl_net_ntry_amt: f64,//TtlNetNtryAmt
-    cdt_dbt_ind: String//CdtDbtInd
+    pub(crate) ttl_net_ntry_amt: f64,//TtlNetNtryAmt
+    pub(crate) cdt_dbt_ind: String//CdtDbtInd
 
 }
 
@@ -270,7 +270,7 @@ pub(crate) struct FromToDtAttribute{
 pub(crate)  struct AcctAttribute {
     pub(crate) id: IdIbanAttribute, //id
     pub(crate) ccy: String, //Ccy
-    nm: String, //nm
+    pub(crate) nm: String, //nm
     pub(crate) ownr: OwnerAttribute, //ownr
     pub(crate) svcr: SvcrAttribute, //svcr
 
@@ -280,7 +280,7 @@ pub(crate)  struct AcctAttribute {
 #[serde(default)]
 pub(crate) struct IdIbanAttribute{
     #[serde(rename="IBAN")]
-    iban: String, //IBAN
+    pub(crate) iban: String, //IBAN
     #[serde(rename="Othr")]
     pub(crate) othr: OtherAttribute,
 }
@@ -301,11 +301,11 @@ pub(crate)  struct FinInstIdAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct OwnerAttribute{
     pub(crate) nm: String, //nm
-    pstl_addr: PostalAddressAttribute, //pstl_addr
-    bldg_nb: u32, //BldgNb
-    pst_cd: u32, //PstCd
-    twn_nm: String, //TwnNm
-    ctry: String, //Ctry
+    pub(crate) pstl_addr: PostalAddressAttribute, //pstl_addr
+    pub(crate) bldg_nb: u32, //BldgNb
+    pub(crate) pst_cd: u32, //PstCd
+    pub(crate) twn_nm: String, //TwnNm
+    pub(crate) ctry: String, //Ctry
     pub(crate) id: IdAttribute, //Id
 }
 
@@ -323,17 +323,17 @@ pub(crate) struct OrgIdAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct OtherAttribute{
     pub(crate) id: String, //id
-    schme_nm: ShemeNumberAttribute //SchmeNm
+    pub(crate) schme_nm: ShemeNumberAttribute //SchmeNm
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
-struct ShemeNumberAttribute{
-    cd: String, //cd
+pub(crate) struct ShemeNumberAttribute{
+    pub(crate) cd: String, //cd
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
-struct PostalAddressAttribute{
-    strt_nm: String, //strt_nm
+pub(crate) struct PostalAddressAttribute{
+    pub(crate) strt_nm: String, //strt_nm
 
 }
 

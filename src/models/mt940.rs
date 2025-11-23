@@ -57,10 +57,10 @@ impl DocumentMt940 {
         }
         None
     }
-    fn parse_field_61(field: &str, vault: &str, ntry: &mut NtryAttribute){
+    fn parse_field_61(field: (&str, &str), vault: &str, ntry: &mut NtryAttribute){
         let regex = Regex::new(r"(\d{6})(\d{4})([CD])(\d+,\d+)([A-Z]{4})(\w+)");
         if let Ok(regex) = regex {
-            if let Some(capture) = regex.captures(field) {
+            if let Some(capture) = regex.captures(field.0) {
                 ntry.val_dt = DtAttribute::format_dt(&capture[1]);
                 let dt =  capture[1][0 .. 2].to_string() + &capture[2][0..4].to_string();
                 ntry.bookg_dt = DtAttribute::format_dt(&dt);
@@ -71,7 +71,7 @@ impl DocumentMt940 {
                     "CRDT".to_string()
                 } else { "DBIT".to_string()};
                 let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
-                DocumentMt940::parse_field_86(field, capture[6].to_string(), &mut nxdet);
+                DocumentMt940::parse_field_86(field.1, capture[6].to_string(), &mut nxdet);
                 ntry.ntry_dtls = nxdet;
             }
         }
@@ -135,7 +135,7 @@ impl DocumentMt940 {
                 field_61.push(capture[1].to_string());
             }
         }
-        reg_pattern = Regex::new(r":86:([\n\w\d ,/-]+):");
+        reg_pattern = Regex::new(r":86:([\n\w\d ,/-]+)");
         if let Ok(regexp) = reg_pattern {
             for capture in regexp.captures_iter(header){
                 field_86.push(capture[1].to_string());
@@ -144,38 +144,43 @@ impl DocumentMt940 {
         let unions: Vec<(String, String)> = field_61.into_iter().zip(field_86.into_iter()).collect();
         for union in unions.iter(){
             let mut ntry = NtryAttribute::default();
-            DocumentMt940::parse_field_61(&union.0, vault, &mut ntry);
+            DocumentMt940::parse_field_61((&union.0, &union.1), vault, &mut ntry);
             nxtry.push(ntry);
         }
         Some(nxtry)
     }
 
     fn parse_field_foo(header: &str, document: &mut BkToCstmrStmt) {
-        let reg_codes = ["26", "25", "28C", "60F", "62F", "62M", "64", "65"];
+        let reg_codes = ["26", "25", "28C", "60F", "60M", "62F", "62M", "64", "65"];
         for reg_code in reg_codes.iter() {
-            let reg_pattern = Regex::new(&format!(r":{}:([\n\w\d ,/-]+):",
+            let reg_pattern = Regex::new(&format!(r":{}:([\n\w\d ,/-]+)",
                                                   reg_code));
             if let Ok(regexp) = reg_pattern{
                 if let Some(capture) = regexp.captures(header){
+                    let capture = capture[1].replace("\n", "")
+                                                  .replace(" ", "");
                     match reg_code.as_ref() {
                         "26" => {
-                            document.grp_hdr.msg_id = capture[1].to_string();
-                            document.stmt.id = capture[1].to_string();
+                            document.grp_hdr.msg_id = capture;
+                            document.stmt.id = document.grp_hdr.msg_id.clone();
                         },
                         "25" => {
-                            document.stmt.acct.ownr.id.org_id.othr.id = capture[1].to_string();
+                            document.stmt.acct.ownr.id.org_id.othr.id = capture;
                         },
                         "28C" => {
-                            let fields: Vec<&str> = capture[1].split('/').collect();
+                            let fields: Vec<&str> = capture.split('/').collect();
                             if fields.len() > 1{
                                 document.stmt.elctrnc_seq_nb = fields[0].to_string();
                                 document.stmt.lgl_seq_nv = fields[1].to_string();
                             }
                         },
-                        "60F" | "62F" | "62M" | "64"  | "65"=> {
-                            if  let Some(mut balance) = DocumentMt940::parse_field_balance(&capture[1]){
+                        "60F" | "60M" | "62F" | "62M" | "64"  | "65"=> {
+                            if  let Some(mut balance) = DocumentMt940::parse_field_balance(&capture){
                                 if *reg_code == "60F" {
                                     balance.tp.cd_or_party.cd = "OPBD".to_string();
+                                }
+                                if *reg_code == "60M" {
+                                    balance.tp.cd_or_party.cd = "OPAV".to_string();
                                 }
                                 if *reg_code == "62F" {
                                     balance.tp.cd_or_party.cd = "CLBD".to_string();
@@ -197,16 +202,18 @@ impl DocumentMt940 {
                 }
             }
         }
-        if let Some(ntry) = DocumentMt940::parse_field_ntry(&header,
-                                                            &document.stmt.bal[0].amt.ccy){
+        let mut acc = "";
+        if let Some(bal) = &document.stmt.bal.get(0){
+            acc = &bal.amt.ccy;
+        }
+        if let Some(ntry) = DocumentMt940::parse_field_ntry(&header, acc){
             document.stmt.ntry = ntry;
-        }//todo: replace this only test
+        }
     }
-
     pub(crate) fn parse_one_record(document: &str) -> Option<BkToCstmrStmt> {
         let mut record: BkToCstmrStmt = BkToCstmrStmt::default();
         for field in 1..6 {
-            let reg_pattern = Regex::new(&format!(r"\{{{}:[\n\w\d ,/:-]*\}}",
+            let reg_pattern = Regex::new(&format!(r"\{{{}:([\n\w\d ,/:-]*)\}}",
                                                   field));
             if let Ok(regexp) = reg_pattern {
                 match regexp.captures(document) {
@@ -233,33 +240,33 @@ impl DocumentMt940 {
         for balance in &record_camt.stmt.bal {
             match balance.tp.cd_or_party.cd.as_ref() {
                 "OPBD" => { record_write.push_str(":60F:") },
+                "OPAV" => { record_write.push_str(":60M:") },
                 "CLBD" => { record_write.push_str(":62F:") },
                 "CLAV" => { record_write.push_str(":62M:") },
                 "ITAV" => { record_write.push_str(":64:") },
                 "FPAV" => { record_write.push_str(":65:") },
                 _ => {}
             }
-            record_write.push_str(balance.tp.cd_or_party.cd.as_ref());
+            record_write.push_str(balance.cd.as_ref());
             let dt = balance.dt.dt.replace("-", "");
-            if dt.len() >= 10 {
-                record_write.push_str(&dt[2..10]);
+            if dt.len() >= 8 {
+                record_write.push_str(&dt[2..8]);
             }
             record_write.push_str(balance.amt.ccy.as_ref());
             record_write.push_str(balance.amt.amt.replace(".", ",").as_ref());
             record_write.push_str("\n");
         }
     }
-
     pub(crate) fn extract_field_61_86_mt940(record_camt: &Vec<NtryAttribute>, record_write: &mut String) {
         for ntry in record_camt {
             record_write.push_str(":61:");
             let mut dt = ntry.val_dt.dt.replace("-", "");
-            if dt.len() >= 10 {
-                record_write.push_str(&dt[2..10]);
+            if dt.len() >= 8 {
+                record_write.push_str(&dt[2..8]);
             }
             dt = ntry.bookg_dt.dt.replace("-", "");
-            if dt.len() >= 10 {
-                record_write.push_str(&dt[4..10]);
+            if dt.len() >= 8 {
+                record_write.push_str(&dt[4..8]);
             }
             if ntry.cdt_dbt_ind == "CRDT" {
                 record_write.push_str(":C")
@@ -320,7 +327,7 @@ impl DocumentMt940 {
 
 #[cfg(test)]
 mod tests {
-    use crate::models::camt053::{HeaderAttribute, StatementAttribute};
+    use crate::models::camt053::*;
     use super::*;
 
     #[test]
@@ -334,13 +341,12 @@ mod tests {
         let doc = "F01ASNBNL21XXXX0000000000".to_string();
         assert_eq!(DocumentMt940::parse_field_one(&doc), "ASNBNL21XXXX".to_string());
     }
-
     #[test]
     fn test_parse_field_two() {
         let doc = "{2:O940ASNBNL21XXXXN}".to_string();
         let mut result = BkToCstmrStmt::default();
         DocumentMt940::parse_field_two(&doc, &mut result);
-        assert_eq!(result, BkToCstmrStmt {
+        assert_eq!(BkToCstmrStmt {
             grp_hdr: HeaderAttribute {
                 msg_id: "ASNBNL21XXXXN".to_string(),
                 cre_dt_tm: "".to_string(),
@@ -356,37 +362,302 @@ mod tests {
                 txs_summry: Default::default(),
                 ntry: vec![],
             },
-        });
+        }, result);
     }
-
     #[test]
     fn test_parse_field_86() {
         let doc = ":86:/NREF/NIOBNL56ASNB9999999999\n".to_string();
         let mut ntry_det_result: NtryDtlsAttribute = NtryDtlsAttribute::default();
-        let mut ntry_det: NtryDtlsAttribute = NtryDtlsAttribute::default();
+        let mut ntry_det_test: NtryDtlsAttribute = NtryDtlsAttribute::default();
         let mut ntry_det_tlds: TxDtlsAttribute = TxDtlsAttribute::default();
         ntry_det_tlds.refs.prtry.tp = "NREF".to_string();
         ntry_det_tlds.refs.prtry.refdt = "NIOBNL56ASNB9999999999".to_string();
-        ntry_det.btch.tx_dtls.push(ntry_det_tlds);
+        ntry_det_test.btch.tx_dtls.push(ntry_det_tlds);
         DocumentMt940::parse_field_86(&doc, "".to_string(), &mut ntry_det_result);
-        assert_eq!(ntry_det_result, ntry_det);
+        assert_eq!(ntry_det_test, ntry_det_result);
     }
     #[test]
     fn test_parse_field_61() {
-        let doc = ":61:2001050105C1000,00NIOBNL56ASNB9999999999\n:86:/NREF/NIOBNL56ASNB9999999999\n".to_string();
+        let field_61 = ":61:2001050105C1000,00NIOBNL56ASNB9999999999\n".to_string();
         let mut ntry_result = NtryAttribute::default();
-        let mut ntry = NtryAttribute::default();
-        ntry.ccy = "EUR".to_string();
-        ntry.val_dt.dt = "2020-01-05".to_string();
-        ntry.bookg_dt.dt = "2020-01-05".to_string();
-        ntry.bx_tx_cd.prtry.cd = "NIOB".to_string();
-        ntry.amt = "1000.00".to_string();
-        ntry.cdt_dbt_ind = "CRDT".to_string();
+        let mut ntry_test = NtryAttribute::default();
+        ntry_test.ccy = "EUR".to_string();
+        ntry_test.val_dt.dt = "2020-01-05".to_string();
+        ntry_test.bookg_dt.dt = "2020-01-05".to_string();
+        ntry_test.bx_tx_cd.prtry.cd = "NIOB".to_string();
+        ntry_test.amt = "1000.00".to_string();
+        ntry_test.cdt_dbt_ind = "CRDT".to_string();
         let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
-        let field = ":86:/NREF/NIOBNL56ASNB9999999999\n";
-        DocumentMt940::parse_field_86(field, "NL56ASNB9999999999".to_string(), &mut nxdet);
-        ntry.ntry_dtls = nxdet;
-        DocumentMt940::parse_field_61(&doc, "EUR", &mut ntry_result);
-        assert_eq!(ntry, ntry_result);
+        let field_86 = ":86:/NREF/NIOBNL56ASNB9999999999\n";
+        DocumentMt940::parse_field_86(field_86, "NL56ASNB9999999999".to_string(), &mut nxdet);
+        ntry_test.ntry_dtls = nxdet;
+        DocumentMt940::parse_field_61((&field_61, &field_86), "EUR", &mut ntry_result);
+        assert_eq!(ntry_test, ntry_result);
+    }
+    #[test]
+    fn test_parse_field_ntry(){
+        let doc = "{1:F01GSCRUS30XXXX3614000002}{2:I940GSCRUS30XXXXN}{4:
+                           :20:15486025400
+                           :25:107048825
+                           :28C:49/2
+                           :60M:C250218USD2732398848,02
+                           :61:2502180218D12,01NTRFGSLNVSHSUTKWDR//GI2504900007841
+                           :86:/EREF/GSLNVSHSUTKWDR
+                                /CRNM/GOLDMAN SACHS BANK USA
+                                /CACT/107045863/CBIC/GSCRUS30XXX
+                                /REMI/USD Payment to Vendor
+                                /OPRP/Tag Payment
+                           :61:2502180218D12,01NTRFGSOXWBAQYTF4VH//GI2504900005623
+                           :86:/EREF/GSOXWBAQYTF4VH
+                                /CRNM/GOLDMAN SACHS BANK USA
+                                /CACT/107045863/CBIC/GSCRUS30XXX
+                                /REMI/The maximum length of the block is 65 characters
+                                /OPRP/Tag Payment}{5:-}".to_string();
+        let result = DocumentMt940::parse_field_ntry(&doc, "USD").unwrap();
+        let ntry_test: Vec<NtryAttribute> = vec![NtryAttribute { ntry_ref: 0, amt: "12.01".to_string(),
+            ccy: "USD".to_string(), cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
+            bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
+            val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
+            bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute
+            { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+            ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0, tx_dtls:
+            vec![TxDtlsAttribute { refs: EndToEndIdAttribute { end_to_end_id: "GSLNVSHSUTKWDR".to_string(), prtry:
+            PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } }, amt_dtls:
+            TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() }, bx_tx_cd: BxTxCdAttribute {
+                domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute {
+                    cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                rltd_pties: RltdPtiesAttribute {
+                cdtr_acct: IdTxDtlsAttribute { id: "".to_string(),
+                    other: IdDtldAttribute { id: "107045863".to_string() } },
+                dbtr_acct: IdTxDtlsAttribute { id: "".to_string(), other: IdDtldAttribute { id: "".to_string() } },
+                cdtr: CdtrAttribue { id: PrvtIdAttribute {
+                    othr: IdDtldAttribute { id: "".to_string() } }, nm: "GOLDMAN".to_string() },
+                dbtr: DbtrAttribute { id: PrvtIdAttribute {
+                    othr: IdDtldAttribute { id: "".to_string() } }, nm: "".to_string() } },
+                rmt_inf: RmtInfAttribute { strd: CdtrRefInfAttribute {
+                    tp: CdOrPrtryAttribute { cd_or_prtry: CdAttribute { cd: "".to_string() } },
+                    ref_cdtr: "".to_string() }, ustrd: "USD".to_string() },
+                rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "".to_string() },
+                rltd_agts: CdtrAgtAttribute {
+                    cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string() },
+                    dbtr_agt: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } },
+                addtl_tx_inf: "Tag".to_string() }] } } }, NtryAttribute {
+            ntry_ref: 0, amt: "12.01".to_string(), ccy: "USD".to_string(),
+            cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
+            bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
+            val_dt: DtAttribute { dt: "2025-02-18".to_string() },
+            acct_svcr_ref: "".to_string(), bx_tx_cd: BxTxCdAttribute {
+                domn: DomnAttribute { cd: "".to_string(),
+                    fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+            ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute {
+                nb_of_txs: 0, tx_dtls: vec![TxDtlsAttribute { refs: EndToEndIdAttribute {
+                    end_to_end_id: "GSOXWBAQYTF4VH".to_string(),
+                    prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
+                    amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
+                    bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                        fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                        prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                    rltd_pties: RltdPtiesAttribute {
+                        cdtr_acct: IdTxDtlsAttribute { id: "".to_string(),
+                            other: IdDtldAttribute { id: "107045863".to_string() } },
+                        dbtr_acct: IdTxDtlsAttribute { id: "".to_string(),
+                            other: IdDtldAttribute { id: "".to_string() } },
+                        cdtr: CdtrAttribue { id: PrvtIdAttribute { othr: IdDtldAttribute {
+                            id: "".to_string() } }, nm: "GOLDMAN".to_string() }, dbtr: DbtrAttribute {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute {
+                                id: "".to_string() } }, nm: "".to_string() } },
+                    rmt_inf: RmtInfAttribute { strd: CdtrRefInfAttribute { tp: CdOrPrtryAttribute {
+                        cd_or_prtry: CdAttribute {
+                            cd: "".to_string() } }, ref_cdtr: "".to_string() }, ustrd: "The".to_string() },
+                    rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "".to_string() },
+                    rltd_agts: CdtrAgtAttribute {
+                        cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string() },
+                        dbtr_agt: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } },
+                    addtl_tx_inf: "Tag".to_string() }] } } }];
+        assert_eq!(ntry_test, result);
+    }
+    #[test]
+    fn test_parse_field_foo(){
+        let mut result = BkToCstmrStmt::default();
+        let document = ":20:15486025400
+                               :25:107048825
+                               :28C:49/2
+                               :60M:C250218USD2732398848,02".to_string();
+        DocumentMt940::parse_field_foo(&document, &mut result);
+        let test = BkToCstmrStmt { grp_hdr: HeaderAttribute { msg_id: "".to_string(), cre_dt_tm: "".to_string() },
+            stmt: StatementAttribute { id: "".to_string(), elctrnc_seq_nb: "49".to_string(),
+                lgl_seq_nv: "2".to_string(), cre_dt_tm: "".to_string(), fr_to_dt: FromToDtAttribute {
+                    fr_dt_tm: "".to_string(), to_dt_tm: "".to_string() }, acct: AcctAttribute {
+                    id: IdIbanAttribute { iban: "".to_string(),
+                        othr: OtherAttribute { id: "".to_string(), schme_nm: ShemeNumberAttribute {
+                            cd: "".to_string() } } }, ccy: "".to_string(), nm: "".to_string(),
+                    ownr: OwnerAttribute { nm: "".to_string(),
+                        pstl_addr: PostalAddressAttribute { strt_nm: "".to_string() }, bldg_nb: 0,
+                        pst_cd: 0, twn_nm: "".to_string(), ctry: "".to_string(), id: IdAttribute {
+                            org_id: OrgIdAttribute { othr: OtherAttribute {
+                                id: "107048825".to_string(), schme_nm: ShemeNumberAttribute {
+                                    cd: "".to_string() } } } } }, svcr: SvcrAttribute {
+                        fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } } },
+                bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
+                    cd_or_party: CdAttribute { cd: "OPAV".to_string() } },
+                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
+                    dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
+                txs_summry: TxsSummryAttribute { ttl_ntries: TtlNtriesAttribute {
+                    nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0, cdt_dbt_ind: "".to_string() },
+                    ttl_cdt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0, sum: "".to_string() },
+                    ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0, sum: "".to_string() } },
+                ntry: Vec::new() } };
+        assert_eq!(test, result);
+    }
+    #[test]
+    fn test_parse_one_record(){
+        let doc = "{1:F01GSCRUS30XXXX3614000002}{2:I940GSCRUS30XXXXN}{4:
+                           :20:15486025400
+                           :25:107048825
+                           :28C:49/2
+                           :60M:C250218USD2732398848,02
+                           :61:2502180218D12,01NTRFGSLNVSHSUTKWDR//GI2504900007841
+                           :86:/EREF/GSLNVSHSUTKWDR
+                                /CRNM/GOLDMAN SACHS BANK USA
+                                /CACT/107045863/CBIC/GSCRUS30XXX
+                                /REMI/USD Payment to Vendor
+                                /OPRP/Tag Payment
+                           :61:2502180218D12,01NTRFGSOXWBAQYTF4VH//GI2504900005623
+                           :86:/EREF/GSOXWBAQYTF4VH
+                                /CRNM/GOLDMAN SACHS BANK USA
+                                /CACT/107045863/CBIC/GSCRUS30XXX
+                                /REMI/The maximum length of the block is 65 characters
+                                /OPRP/Tag Payment}{5:-}".to_string();
+        let result = DocumentMt940::parse_one_record(&doc).unwrap();
+        let test = BkToCstmrStmt { grp_hdr: HeaderAttribute {
+            msg_id: "GSCRUS30XXXXN".to_string(), cre_dt_tm: "".to_string() },
+            stmt: StatementAttribute { id: "GSCRUS30XXXXN-940".to_string(),
+                elctrnc_seq_nb: "49".to_string(), lgl_seq_nv: "2".to_string(), cre_dt_tm: "".to_string(),
+                fr_to_dt: FromToDtAttribute { fr_dt_tm: "".to_string(), to_dt_tm: "".to_string() },
+                acct: AcctAttribute { id: IdIbanAttribute { iban: "".to_string(),
+                    othr: OtherAttribute { id: "".to_string(),
+                        schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                    ccy: "".to_string(), nm: "".to_string(), ownr: OwnerAttribute {
+                        nm: "".to_string(), pstl_addr: PostalAddressAttribute {
+                            strt_nm: "".to_string() }, bldg_nb: 0,
+                        pst_cd: 0, twn_nm: "".to_string(), ctry: "".to_string(),
+                        id: IdAttribute { org_id: OrgIdAttribute {
+                            othr: OtherAttribute { id: "107048825".to_string(),
+                                schme_nm: ShemeNumberAttribute {
+                                    cd: "".to_string() } } } } },
+                    svcr: SvcrAttribute { fin_instn_id: FinInstIdAttribute {
+                        bic: "GSCRUS30XXXX".to_string(), nm: "".to_string() } } },
+                bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
+                    cd_or_party: CdAttribute { cd: "OPAV".to_string() } },
+                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
+                    dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
+                txs_summry: TxsSummryAttribute { ttl_ntries: TtlNtriesAttribute {
+                    nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0,
+                    cdt_dbt_ind: "".to_string() }, ttl_cdt_ntries: TtlCdtDbtNtriesAttribute {
+                    nb_of_ntries: 0, sum: "".to_string() },
+                    ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0,
+                        sum: "".to_string() } }, ntry: vec![NtryAttribute { ntry_ref: 0,
+                    amt: "12.01".to_string(), ccy: "USD".to_string(), cdt_dbt_ind: "DBIT".to_string(),
+                    sts: "".to_string(), bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
+                    val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
+                    bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                        fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                        prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+                    ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute {
+                        nb_of_txs: 0, tx_dtls: vec![TxDtlsAttribute {
+                            refs: EndToEndIdAttribute { end_to_end_id: "GSLNVSHSUTKWDR".to_string(),
+                                prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
+                            amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
+                            bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                                fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                                prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                            rltd_pties: RltdPtiesAttribute { cdtr_acct: IdTxDtlsAttribute {
+                                id: "".to_string(), other: IdDtldAttribute { id: "107045863".to_string() } },
+                                dbtr_acct: IdTxDtlsAttribute { id: "".to_string(),
+                                    other: IdDtldAttribute { id: "".to_string() } },
+                                cdtr: CdtrAttribue { id: PrvtIdAttribute {
+                                    othr: IdDtldAttribute { id: "".to_string() } },
+                                    nm: "GOLDMAN".to_string() }, dbtr: DbtrAttribute {
+                                    id: PrvtIdAttribute { othr: IdDtldAttribute {
+                                        id: "".to_string() } }, nm: "".to_string() } },
+                            rmt_inf: RmtInfAttribute { strd: CdtrRefInfAttribute {
+                                tp: CdOrPrtryAttribute { cd_or_prtry: CdAttribute {
+                                    cd: "".to_string() } }, ref_cdtr: "".to_string() }, ustrd: "USD".to_string() },
+                            rltd_dts: RltdDtsAttribute { accpt_nc_dt_tm: "".to_string() },
+                            rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute {
+                                bic: "GSCRUS30XXX".to_string(), nm: "".to_string() }, dbtr_agt: FinInstIdAttribute {
+                                bic: "".to_string(), nm: "" .to_string()} }, addtl_tx_inf: "Tag".to_string() }] } } },
+                    NtryAttribute { ntry_ref: 0, amt: "12.01".to_string(), ccy: "USD".to_string(),
+                        cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(), bookg_dt: DtAttribute {
+                            dt: "2025-02-18".to_string() }, val_dt: DtAttribute { dt: "2025-02-18".to_string() },
+                        acct_svcr_ref: "".to_string(), bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute {
+                            cd: "".to_string(), fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                            prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+                        ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0,
+                            tx_dtls: vec![TxDtlsAttribute {
+                                refs: EndToEndIdAttribute { end_to_end_id: "GSOXWBAQYTF4VH".to_string(),
+                                    prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
+                                amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
+                                bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                                    fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                                    prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                                rltd_pties: RltdPtiesAttribute { cdtr_acct: IdTxDtlsAttribute {
+                                    id: "".to_string(), other: IdDtldAttribute { id: "107045863".to_string() } },
+                                    dbtr_acct: IdTxDtlsAttribute { id: "".to_string(),
+                                        other: IdDtldAttribute { id: "".to_string() } },
+                                    cdtr: CdtrAttribue { id: PrvtIdAttribute {
+                                        othr: IdDtldAttribute { id: "".to_string() } },
+                                        nm: "GOLDMAN".to_string() }, dbtr: DbtrAttribute {
+                                        id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                                        nm: "".to_string() } }, rmt_inf: RmtInfAttribute {
+                                    strd: CdtrRefInfAttribute { tp: CdOrPrtryAttribute {
+                                        cd_or_prtry: CdAttribute { cd: "".to_string() } }, ref_cdtr: "".to_string() },
+                                    ustrd: "The".to_string() }, rltd_dts: RltdDtsAttribute {
+                                    accpt_nc_dt_tm: "".to_string() }, rltd_agts: CdtrAgtAttribute {
+                                    cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(),
+                                        nm: "".to_string() }, dbtr_agt: FinInstIdAttribute {
+                                        bic: "".to_string(), nm: "".to_string() } }, addtl_tx_inf: "Tag".to_string() }] } } }] } };
+        assert_eq!(test, result);
+    }
+    #[test]
+    fn test_extract_field_6x_mt940(){
+        let document = BkToCstmrStmt { grp_hdr: HeaderAttribute {
+            msg_id: "GSCRUS30XXXXN".to_string(), cre_dt_tm: "".to_string() },
+            stmt: StatementAttribute { id: "GSCRUS30XXXXN-940".to_string(),
+                elctrnc_seq_nb: "49".to_string(), lgl_seq_nv: "2".to_string(), cre_dt_tm: "".to_string(),
+                fr_to_dt: FromToDtAttribute { fr_dt_tm: "".to_string(), to_dt_tm: "".to_string() },
+                acct: AcctAttribute { id: IdIbanAttribute { iban: "".to_string(),
+                    othr: OtherAttribute { id: "".to_string(),
+                        schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                    ccy: "".to_string(), nm: "".to_string(), ownr: OwnerAttribute {
+                        nm: "".to_string(), pstl_addr: PostalAddressAttribute {
+                            strt_nm: "".to_string() }, bldg_nb: 0,
+                        pst_cd: 0, twn_nm: "".to_string(), ctry: "".to_string(),
+                        id: IdAttribute { org_id: OrgIdAttribute {
+                            othr: OtherAttribute { id: "107048825".to_string(),
+                                schme_nm: ShemeNumberAttribute {
+                                    cd: "".to_string() } } } } },
+                    svcr: SvcrAttribute { fin_instn_id: FinInstIdAttribute {
+                        bic: "GSCRUS30XXXX".to_string(), nm: "".to_string() } } },
+                bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
+                    cd_or_party: CdAttribute { cd: "OPAV".to_string() } },
+                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
+                    dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
+                txs_summry: TxsSummryAttribute { ttl_ntries: TtlNtriesAttribute {
+                    nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0,
+                    cdt_dbt_ind: "".to_string() }, ttl_cdt_ntries: TtlCdtDbtNtriesAttribute {
+                    nb_of_ntries: 0, sum: "".to_string() },
+                    ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0,
+                        sum: "".to_string() } }, ntry: Vec::new()} };
+        let mut result = String::new();
+        DocumentMt940::extract_field_6x_mt940(&document, &mut result);
+        assert_eq!(":60M:C250218USD2732398848,02\n".to_string(), result);
+    }
+    #[test]
+    fn test_extract_field_61_86_mt940(){
+        
     }
 }
