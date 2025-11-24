@@ -40,9 +40,7 @@ pub(crate)  struct StatementAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub (crate) struct NtryAttribute{
     pub(crate) ntry_ref: u32, //NtryRef
-    pub(crate) amt: String, //Amt
-    #[serde(rename="@Ccy")]
-    pub(crate) ccy: String, //Ccy
+    pub(crate) amt: AmtAttribute, //Amt
     pub(crate) cdt_dbt_ind: String, //CdtDbtInd
     pub(crate) sts: String, //Sts
     pub(crate) bookg_dt: DtAttribute, //BookgDt
@@ -179,6 +177,7 @@ pub(crate) struct IdDtldAttribute{
 pub(crate) struct AmtAttribute{
     #[serde(rename="@Ccy")]
     pub(crate) ccy: String,//Ccy
+    #[serde(rename="#text")]
     pub(crate) amt: String
 }
 

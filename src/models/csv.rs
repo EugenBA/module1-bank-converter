@@ -136,18 +136,18 @@ impl DocumentCsv {
             }
             let mut ntry = NtryAttribute::default();
             let mut ntry_det = TxDtlsAttribute::default();
-            ntry.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
+            ntry.amt.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
             if let Some(date) = DocumentCsv::extract_date(&row.b){
                 ntry.val_dt.dt = date;
                 ntry.bookg_dt.dt = ntry.val_dt.dt.clone();
             }
             if row.j.is_empty(){
                 ntry.cdt_dbt_ind = "CDIT".to_string();
-                ntry.amt = row.n.to_string();
+                ntry.amt.amt = row.n.to_string();
             }
             else{
                 ntry.cdt_dbt_ind =  "DBIT".to_string();
-                ntry.amt = row.j.to_string();
+                ntry.amt.amt = row.j.to_string();
             }
             ntry.bx_tx_cd.prtry.cd = row.q.to_string();
             ntry.bx_tx_cd.prtry.issr = self.rows[2].b.to_string();
@@ -227,10 +227,10 @@ impl DocumentCsv {
                 let mut row = RowCsv::new();
                 row.b = ntry.bookg_dt.dt.clone();
                 if ntry.cdt_dbt_ind == "CDIT"{
-                    row.n = ntry.amt.clone();
+                    row.n = ntry.amt.amt.clone();
                 }
                 if ntry.cdt_dbt_ind == "DBIT"{
-                    row.j = ntry.amt.clone();
+                    row.j = ntry.amt.amt.clone();
                 }
                 row.q = ntry.bx_tx_cd.prtry.cd.clone();
                 row.o = ntry.acct_svcr_ref.clone();

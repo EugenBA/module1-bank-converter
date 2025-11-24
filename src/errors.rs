@@ -25,7 +25,7 @@ pub enum ParserError
 impl Display for ParserError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ParserError::FileReadError(s) => write!(f, "File read or write error: {}", s),
+            ParserError::FileReadError(s) => write!(f, "File read error: {}", s),
             ParserError::BadInputFormatFile(s) => write!(f, "Bad input format file: {}", s),
             ParserError::BadFormatType(s) => write!(f, "Bad format type: {}", s),
             ParserError::BadCsvDeserializeError(s) => write!(f, "Csv format deserialize error: {}", s),

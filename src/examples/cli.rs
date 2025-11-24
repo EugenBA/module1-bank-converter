@@ -109,7 +109,7 @@ fn main() {
     args.push(String::from("--in_format"));
     args.push(String::from("CAMT053"));
     args.push(String::from("--out_format"));
-    args.push(String::from("MT940"));
+    args.push(String::from("CAMT053"));
     while args.len() > 1
     {
         match args.remove(1).as_str(){
@@ -142,10 +142,10 @@ fn main() {
         eprintln!("Не указаны форматы входного или выходного файла");
         return;
     }
-    if converter.data_in == converter.data_out{
-        eprintln!("Выбран один и тот же формат для входного и выходного файлов");
-        return;
-    }
+    //if converter.data_in == converter.data_out{
+    //    eprintln!("Выбран один и тот же формат для входного и выходного файлов");
+   //     return;
+   // }
     if !Path::new(&in_file).exists() {
         eprintln!("Файл {} не существует", in_file);
         return;

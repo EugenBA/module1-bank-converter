@@ -1,5 +1,6 @@
 use std::io::{Write};
 use csv::{Writer};
+use serde_xml_rs::to_string;
 use crate::errors::{ConvertError};
 use crate::models::camt053::{DocumentCamt053};
 use crate ::models::mt940::{DocumentMt940};
@@ -7,13 +8,52 @@ use crate::models::csv::{DocumentCsv};
 
 
 impl DocumentCamt053 {
+    /// Сохраняет файл формата CAMT053.
+    ///
+    /// # Аргументы
+    ///
+    /// * `w` - writer (любой тип реал изующий терейт Write)
+    ///
+    /// # Возвращает
+    ///
+    /// `Ok(())` с содержимым файла в случае успеха,
+    /// `Err(ConvertError)` в случае ошибки.
+    ///
+    /// # Ошибки
+    ///
+    /// Возвращает ошибку, если:
+    /// * Ошибка записи файла
+    ///
     pub fn write_to<W: Write>(&mut self, writer: &mut W) -> Result<(), ConvertError> {
-        serde_xml_rs::to_writer(writer, &self)?;
+        //let mut record_write = String::new();
+        let mut record_write = to_string(&self)?;
+        record_write = record_write.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Document>",
+                                            "<Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:camt.053.001.02\" \
+                                            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \
+                                            xsi:schemaLocation=\"urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd\">");
+        writer.write_all(record_write.as_bytes())?;
+        writer.flush()?;
         Ok(())
     }
 }
 
 impl DocumentMt940 {
+    /// Сохраняет файл формата MT940.
+    ///
+    /// # Аргументы
+    ///
+    /// * `w` - writer (любой тип реал изующий терейт Write)
+    ///
+    /// # Возвращает
+    ///
+    /// `Ok(())` с содержимым файла в случае успеха,
+    /// `Err(ConvertError)` в случае ошибки.
+    ///
+    /// # Ошибки
+    ///
+    /// Возвращает ошибку, если:
+    /// * Ошибка записи файла
+    ///
     pub fn write_to<W: Write>(&mut self, writer: &mut W) -> Result<(), ConvertError> {
         let mut record_write = String::new();
         for record in &self.document {
@@ -46,6 +86,22 @@ impl DocumentMt940 {
 }
 
 impl DocumentCsv {
+    /// Сохраняет файл формата CSV.
+    ///
+    /// # Аргументы
+    ///
+    /// * `w` - writer (любой тип реал изующий терейт Write)
+    ///
+    /// # Возвращает
+    ///
+    /// `Ok(())` с содержимым файла в случае успеха,
+    /// `Err(ConvertError)` в случае ошибки.
+    ///
+    /// # Ошибки
+    ///
+    /// Возвращает ошибку, если:
+    /// * Ошибка записи файла
+    ///
     pub fn write_to<W: std::io::Write>(&mut self, writer: &mut W) -> Result<(), ConvertError> {
         let mut csv_wrt = Writer::from_writer(writer);
         for row in &self.rows {

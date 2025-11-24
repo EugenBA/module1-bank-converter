@@ -65,8 +65,8 @@ impl DocumentMt940 {
                 let dt =  capture[1][0 .. 2].to_string() + &capture[2][0..4].to_string();
                 ntry.bookg_dt = DtAttribute::format_dt(&dt);
                 ntry.bx_tx_cd.prtry.cd = capture[5].to_string();
-                ntry.amt = capture[4].replace(",", ".").to_string();
-                ntry.ccy = vault.to_string();
+                ntry.amt.amt = capture[4].replace(",", ".").to_string();
+                ntry.amt.ccy = vault.to_string();
                 ntry.cdt_dbt_ind  = if capture[3].to_string() == "C".to_string(){
                     "CRDT".to_string()
                 } else { "DBIT".to_string()};
@@ -245,7 +245,7 @@ impl DocumentMt940 {
                 "CLAV" => { record_write.push_str(":62M:") },
                 "ITAV" => { record_write.push_str(":64:") },
                 "FPAV" => { record_write.push_str(":65:") },
-                _ => {}
+                _ => { continue}
             }
             record_write.push_str(balance.cd.as_ref());
             let dt = balance.dt.dt.replace("-", "");
@@ -269,13 +269,14 @@ impl DocumentMt940 {
                 record_write.push_str(&dt[4..8]);
             }
             if ntry.cdt_dbt_ind == "CRDT" {
-                record_write.push_str(":C")
-            } else { record_write.push_str(":D") };
-            record_write.push_str(ntry.amt.replace(".", ",").as_ref());
+                record_write.push_str("C")
+            } else { record_write.push_str("D") };
+            record_write.push_str(ntry.amt.amt.replace(".", ",").as_ref());
             record_write.push_str(ntry.bx_tx_cd.prtry.cd.as_ref());
             if !ntry.ntry_dtls.btch.tx_dtls.is_empty() {
                 record_write.push_str(ntry.ntry_dtls.btch.tx_dtls[0].refs.end_to_end_id.as_ref());
             }
+            record_write.push_str("\n");
             for tx_dtls in &ntry.ntry_dtls.btch.tx_dtls {
                 record_write.push_str(":86:/NREF/");
                 record_write.push_str(tx_dtls.refs.end_to_end_id.as_ref());
@@ -381,11 +382,11 @@ mod tests {
         let field_61 = ":61:2001050105C1000,00NIOBNL56ASNB9999999999\n".to_string();
         let mut ntry_result = NtryAttribute::default();
         let mut ntry_test = NtryAttribute::default();
-        ntry_test.ccy = "EUR".to_string();
+        ntry_test.amt.ccy = "EUR".to_string();
         ntry_test.val_dt.dt = "2020-01-05".to_string();
         ntry_test.bookg_dt.dt = "2020-01-05".to_string();
         ntry_test.bx_tx_cd.prtry.cd = "NIOB".to_string();
-        ntry_test.amt = "1000.00".to_string();
+        ntry_test.amt.amt = "1000.00".to_string();
         ntry_test.cdt_dbt_ind = "CRDT".to_string();
         let mut nxdet: NtryDtlsAttribute = NtryDtlsAttribute::default();
         let field_86 = ":86:/NREF/NIOBNL56ASNB9999999999\n";
@@ -414,8 +415,9 @@ mod tests {
                                 /REMI/The maximum length of the block is 65 characters
                                 /OPRP/Tag Payment}{5:-}".to_string();
         let result = DocumentMt940::parse_field_ntry(&doc, "USD").unwrap();
-        let ntry_test: Vec<NtryAttribute> = vec![NtryAttribute { ntry_ref: 0, amt: "12.01".to_string(),
-            ccy: "USD".to_string(), cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
+        let ntry_test: Vec<NtryAttribute> = vec![NtryAttribute { ntry_ref: 0,
+            amt: AmtAttribute{amt: "12.01".to_string(),
+            ccy: "USD".to_string()}, cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
             bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
             val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
             bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute
@@ -444,7 +446,7 @@ mod tests {
                     cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string() },
                     dbtr_agt: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } },
                 addtl_tx_inf: "Tag".to_string() }] } } }, NtryAttribute {
-            ntry_ref: 0, amt: "12.01".to_string(), ccy: "USD".to_string(),
+            ntry_ref: 0, amt: AmtAttribute{amt: "12.01".to_string(), ccy: "USD".to_string()},
             cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
             bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
             val_dt: DtAttribute { dt: "2025-02-18".to_string() },
@@ -560,7 +562,7 @@ mod tests {
                     nb_of_ntries: 0, sum: "".to_string() },
                     ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0,
                         sum: "".to_string() } }, ntry: vec![NtryAttribute { ntry_ref: 0,
-                    amt: "12.01".to_string(), ccy: "USD".to_string(), cdt_dbt_ind: "DBIT".to_string(),
+                    amt: AmtAttribute{amt: "12.01".to_string(), ccy: "USD".to_string()}, cdt_dbt_ind: "DBIT".to_string(),
                     sts: "".to_string(), bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
                     val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
                     bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
@@ -590,7 +592,7 @@ mod tests {
                             rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute {
                                 bic: "GSCRUS30XXX".to_string(), nm: "".to_string() }, dbtr_agt: FinInstIdAttribute {
                                 bic: "".to_string(), nm: "" .to_string()} }, addtl_tx_inf: "Tag".to_string() }] } } },
-                    NtryAttribute { ntry_ref: 0, amt: "12.01".to_string(), ccy: "USD".to_string(),
+                    NtryAttribute { ntry_ref: 0, amt: AmtAttribute{amt: "12.01".to_string(), ccy: "USD".to_string()},
                         cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(), bookg_dt: DtAttribute {
                             dt: "2025-02-18".to_string() }, val_dt: DtAttribute { dt: "2025-02-18".to_string() },
                         acct_svcr_ref: "".to_string(), bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute {
