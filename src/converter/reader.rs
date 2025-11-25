@@ -3,7 +3,7 @@ use crate::errors::ParserError;
 use crate::models::camt053::{DocumentCamt053};
 use crate::models::mt940::{DocumentMt940};
 use crate::models::csv::{DocumentCsv, RowCsv};
-use csv::Reader;
+use csv::{ReaderBuilder};
 use regex::{Regex};
 
 
@@ -105,7 +105,8 @@ impl DocumentCsv {
     ///
     pub fn from_read<R: Read>(r: &mut R) -> Result<Self, ParserError> {
         let mut csv_document: DocumentCsv = DocumentCsv::new();
-        let mut csv_rdr = Reader::from_reader(r);
+        let mut csv_rdr = ReaderBuilder::new().has_headers(false)
+                                                            .from_reader(r);
         for row in csv_rdr.deserialize() {
             let row_data: RowCsv = row?;
             csv_document.rows.push(row_data);
