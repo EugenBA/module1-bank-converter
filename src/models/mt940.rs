@@ -1,5 +1,6 @@
 use regex::Regex;
-use crate::models::camt053::{BalanceAttribute, BkToCstmrStmt, DtAttribute, NtryAttribute, NtryDtlsAttribute, TxDtlsAttribute};
+use crate::models::camt053::{BalanceAttribute, BkToCstmrStmt, DtAttribute, NtryAttribute,
+                             NtryDtlsAttribute, TxDtlsAttribute};
 
 pub struct DocumentMt940 {
     pub(crate) document: Vec<BkToCstmrStmt>
@@ -275,6 +276,7 @@ impl DocumentMt940 {
             record_write.push_str(ntry.bk_tx_cd.prtry.cd.as_ref());
             if !ntry.ntry_dtls.tx_dtls.is_empty() {
                 record_write.push_str(ntry.ntry_dtls.tx_dtls[0].refs.end_to_end_id.as_ref());
+                record_write.push_str(" ");
             }
             record_write.push_str("\n");
             for tx_dtls in &ntry.ntry_dtls.tx_dtls {

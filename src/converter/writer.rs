@@ -1,5 +1,5 @@
 use std::io::{Write};
-use csv::{Writer};
+use csv::{WriterBuilder};
 use serde_xml_rs::to_string;
 use crate::errors::{ConvertError};
 use crate::models::camt053::{DocumentCamt053};
@@ -102,8 +102,8 @@ impl DocumentCsv {
     /// Возвращает ошибку, если:
     /// * Ошибка записи файла
     ///
-    pub fn write_to<W: std::io::Write>(&mut self, writer: &mut W) -> Result<(), ConvertError> {
-        let mut csv_wrt = Writer::from_writer(writer);
+    pub fn write_to<W: Write>(&mut self, writer: &mut W) -> Result<(), ConvertError> {
+        let mut csv_wrt = WriterBuilder::new().has_headers(false).from_writer(writer);
         for row in &self.rows {
             csv_wrt.serialize(row)?;
             csv_wrt.flush()?;

@@ -47,6 +47,7 @@ pub (crate) struct NtryAttribute{
     pub(crate) val_dt: DtAttribute, //ValDt
     pub(crate) acct_svcr_ref: String, //AcctSvcrRef
     pub(crate) bk_tx_cd: BxTxCdAttribute, //BkTxCd
+    pub(crate) addtl_inf_ind: AddtlTxInfAtttribute, //AddtlTxInf
     pub(crate) ntry_dtls: NtryDtlsAttribute//NtryDtls
 
 }
@@ -68,11 +69,18 @@ pub(crate) struct TxDtlsAttribute {
     pub(crate) refs: EndToEndIdAttribute, //Refs
     pub(crate) amt_dtls: TxAmtAttribute, //AmtDtls
     pub(crate) bk_tx_cd: BxTxCdAttribute, //BxTxCd
-    pub(crate) addtl_tx_inf: String, //AddtlTxInf
     pub(crate) rltd_pties: RltdPtiesAttribute, //RltdPties
     pub(crate) rltd_agts: CdtrAgtAttribute, //RltdAgts
     pub(crate) rmt_inf: RmtInfAttribute, //RmtInf
     pub(crate) rltd_dts: RltdDtsAttribute, //RltdDts
+    pub(crate) addtl_tx_inf: String
+
+}
+
+#[derive(Debug, Deserialize, Default, Serialize, PartialEq)]
+#[serde(rename_all = "PascalCase", default)]
+pub(crate) struct AddtlTxInfAtttribute{
+    pub(crate) msg_nm_id: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
