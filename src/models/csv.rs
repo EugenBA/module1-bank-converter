@@ -45,7 +45,6 @@ impl DocumentCsv {
         }
         None
     }
-
     fn convert_ru_month_to_number(val: &str) -> Option<String> {
         let number_month = val.replace("января", "01")
             .replace("февраля", "02")
@@ -129,7 +128,7 @@ impl DocumentCsv {
         if let Some(ccy) = DocumentCsv::extract_ccy(&self.rows[7].c){
             camt_bk_to_cstm.stmt.acct.ccy =ccy;
         }
-        for index_row in 9..self.rows.len() {
+        for index_row in 11..self.rows.len() {
             let row = &self.rows[index_row];
             if row.b.is_empty() {
                 break;
@@ -288,5 +287,50 @@ impl DocumentCsv {
             return Ok(csv);
         }
         Err(ParserError::BadCsvDeserializeError("No document to convert CSV format".to_string()))
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+    #[test]
+    fn test_extract_time(){
+        let test = "time 12:34:56";
+        assert_eq!("12:34:56", DocumentCsv::extract_time(test).unwrap());
+    }
+
+    #[test]
+    fn test_extract_date(){
+        let test = "date 12.01.2021";
+        assert_eq!("2021-01-12", DocumentCsv::extract_date(test).unwrap());
+    }
+
+    #[test]
+    fn test_convert_ru_month_to_number(){
+        let test = "января";
+        assert_eq!("01", DocumentCsv::convert_ru_month_to_number(test).unwrap());
+    }
+
+    #[test]
+    fn test_extract_date_rus(){
+        let test = "10 октября 2023";
+        assert_eq!("2023-10-10", DocumentCsv::extract_date_rus(test).unwrap());
+    }
+
+    #[test]
+    fn test_extract_crd_agent(){
+        let mut test = TxDtlsAttribute::default();
+        let data = "БИК 044525545 АО ЮниКредит Банк, г.Москва";
+        test.rltd_agts.dbtr_agt.fin_instn_id.bic = "044525545".to_string();
+        test.rltd_agts.dbtr_agt.fin_instn_id.nm = "АО ЮниКредит Банк".to_string();
+        let mut result = TxDtlsAttribute::default();
+        DocumentCsv::extract_crd_agent(&data, &mut result);
+        assert_eq!(test, result);
+    }
+
+    #[test]
+    fn test_extract_ccy(){
+        let test = "Доллар США";
+        assert_eq!("USD", DocumentCsv::extract_ccy(test).unwrap());
     }
 }

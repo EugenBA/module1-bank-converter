@@ -423,69 +423,115 @@ mod tests {
                                 /OPRP/Tag Payment}{5:-}".to_string();
         let result = DocumentMt940::parse_field_ntry(&doc, "USD").unwrap();
         let ntry_test: Vec<NtryAttribute> = vec![NtryAttribute { ntry_ref: 0,
-            amt: AmtAttribute{amt: "12.01".to_string(),
-            ccy: "USD".to_string()}, cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
-            bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
+            amt: AmtAttribute { ccy: "USD".to_string(), amt: "12.01".to_string() },
+            cdt_dbt_ind: "DBIT".to_string(),
+            sts: "".to_string(), bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
             val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
-            bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute
-            { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+            bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
                 prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
-            ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0, tx_dtls:
-            vec![TxDtlsAttribute { refs: EndToEndIdAttribute { end_to_end_id: "GSLNVSHSUTKWDR".to_string(), prtry:
-            PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } }, amt_dtls:
-            TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() }, bx_tx_cd: BxTxCdAttribute {
-                domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute {
-                    cd: "".to_string(), sub_fmly_cd: "".to_string() } },
-                prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
-                rltd_pties: RltdPtiesAttribute {
-                cdtr_acct: IdTxDtlsAttribute { id: "".to_string(),
-                    other: IdDtldAttribute { id: "107045863".to_string() } },
-                dbtr_acct: IdTxDtlsAttribute { id: "".to_string(), other: IdDtldAttribute { id: "".to_string() } },
-                cdtr: CdtrAttribue { id: PrvtIdAttribute {
-                    othr: IdDtldAttribute { id: "".to_string() } }, nm: "GOLDMAN".to_string() },
-                dbtr: DbtrAttribute { id: PrvtIdAttribute {
-                    othr: IdDtldAttribute { id: "".to_string() } }, nm: "".to_string() } },
-                rmt_inf: RmtInfAttribute { strd: CdtrRefInfAttribute {
-                    tp: CdOrPrtryAttribute { cd_or_prtry: CdAttribute { cd: "".to_string() } },
-                    ref_cdtr: "".to_string() }, ustrd: "USD".to_string() },
-                rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
-                rltd_agts: CdtrAgtAttribute {
-                    cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string() },
-                    dbtr_agt: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } },
-                addtl_tx_inf: "Tag".to_string() }] } } }, NtryAttribute {
-            ntry_ref: 0, amt: AmtAttribute{amt: "12.01".to_string(), ccy: "USD".to_string()},
-            cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(),
-            bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
-            val_dt: DtAttribute { dt: "2025-02-18".to_string() },
-            acct_svcr_ref: "".to_string(), bk_tx_cd: BxTxCdAttribute {
-                domn: DomnAttribute { cd: "".to_string(),
-                    fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
-                prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+            addtl_inf_ind: AddtlTxInfAtttribute { msg_nm_id: "".to_string() },
             ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute {
-                nb_of_txs: 0, tx_dtls: vec![TxDtlsAttribute { refs: EndToEndIdAttribute {
-                    end_to_end_id: "GSOXWBAQYTF4VH".to_string(),
-                    prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
-                    amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
-                    bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
-                        fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
-                        prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
-                    rltd_pties: RltdPtiesAttribute {
-                        cdtr_acct: IdTxDtlsAttribute { id: "".to_string(),
-                            other: IdDtldAttribute { id: "107045863".to_string() } },
-                        dbtr_acct: IdTxDtlsAttribute { id: "".to_string(),
-                            other: IdDtldAttribute { id: "".to_string() } },
-                        cdtr: CdtrAttribue { id: PrvtIdAttribute { othr: IdDtldAttribute {
-                            id: "".to_string() } }, nm: "GOLDMAN".to_string() }, dbtr: DbtrAttribute {
-                            id: PrvtIdAttribute { othr: IdDtldAttribute {
-                                id: "".to_string() } }, nm: "".to_string() } },
-                    rmt_inf: RmtInfAttribute { strd: CdtrRefInfAttribute { tp: CdOrPrtryAttribute {
-                        cd_or_prtry: CdAttribute {
-                            cd: "".to_string() } }, ref_cdtr: "".to_string() }, ustrd: "The".to_string() },
-                    rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
-                    rltd_agts: CdtrAgtAttribute {
-                        cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string() },
-                        dbtr_agt: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } },
-                    addtl_tx_inf: "Tag".to_string() }] } } }];
+                nb_of_txs: 0 }, tx_dtls: vec![TxDtlsAttribute {
+                refs: EndToEndIdAttribute { pmt_inf_id: "".to_string(),
+                    instr_id: "".to_string(), end_to_end_id: "GSLNVSHSUTKWDR".to_string(),
+                    tx_id: "".to_string(), prtry: PrtryDetAttribute {
+                        tp: "".to_string(), refdt: "".to_string() } }, amt_dtls: TxAmtAttribute {
+                    end_to_end_id: "".to_string(), instd_amt: PrtryAmtAttribute {
+                        tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                        ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(),
+                            trgt_ccy: "".to_string(), unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                    tx_amt: PrtryAmtAttribute { tp: "".to_string(), amt: AmtAttribute {
+                        ccy: "".to_string(), amt: "".to_string() }, ccy_xchg: CcyXchgAttribute {
+                        src_ccy: "".to_string(), trgt_ccy: "".to_string(), unit_ccy: "".to_string(),
+                        xchg_rate: "".to_string() } }, prtry_amt: PrtryAmtAttribute {
+                        tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                        ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(), trgt_ccy: "".to_string(),
+                            unit_ccy: "".to_string(), xchg_rate: "".to_string() } }, amt: "".to_string() },
+                bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                    fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                    prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                rltd_pties: RltdPtiesAttribute { dbtr: DbtrAttribute {
+                    id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                    nm: "".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                        bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                        adr_line: Vec::new() } }, dbtr_acct: IdTxDtlsAttribute {
+                    id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute {
+                        id: "".to_string(), schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                    other: IdDtldAttribute { id: "".to_string() } }, cdtr: CdtrAttribue {
+                    id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                    nm: "GOLDMAN".to_string(), pstl_adr: PostalAddressAttribute {
+                        strt_nm: "".to_string(), bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                        ctry: "".to_string(), adr_line: Vec::new() } }, cdtr_acct: IdTxDtlsAttribute {
+                    id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute {
+                        id: "".to_string(), schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                    other: IdDtldAttribute { id: "107045863".to_string() } } },
+                rltd_agts: CdtrAgtAttribute { cdtr_agt: SvcrAttribute {
+                    fin_instn_id: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(),
+                        nm: "".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                            bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                            adr_line: Vec::new() } } }, dbtr_agt: SvcrAttribute {
+                    fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string(),
+                        pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                            bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                            adr_line: Vec::new() } } } }, rmt_inf: RmtInfAttribute {
+                    ustrd: vec!["USD".to_string()], strd: StrdAttribute { cdtr_ref_inf: CdtrRefInfAttribute {
+                        tp: CdOrPrtryAttribute { cd_or_prtry: CdAttribute { cd: "".to_string() } },
+                        ref_cdtr: "".to_string() } } }, rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
+                addtl_tx_inf: "Tag".to_string() }] } }, NtryAttribute { ntry_ref: 0,
+            amt: AmtAttribute { ccy: "USD".to_string(), amt: "12.01".to_string() }, cdt_dbt_ind: "DBIT".to_string(),
+            sts: "".to_string(), bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
+            val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
+            bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+            addtl_inf_ind: AddtlTxInfAtttribute { msg_nm_id: "".to_string() },
+            ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0 },
+                tx_dtls: vec![TxDtlsAttribute { refs: EndToEndIdAttribute {
+                    pmt_inf_id: "".to_string(), instr_id: "".to_string(), end_to_end_id: "GSOXWBAQYTF4VH".to_string(),
+                    tx_id: "".to_string(), prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
+                    amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(),
+                        instd_amt: PrtryAmtAttribute {
+                        tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                        ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(), trgt_ccy: "".to_string(),
+                            unit_ccy: "".to_string(), xchg_rate: "".to_string() } }, tx_amt: PrtryAmtAttribute {
+                        tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                        ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(), trgt_ccy: "".to_string(),
+                            unit_ccy: "".to_string(), xchg_rate: "".to_string() } }, prtry_amt: PrtryAmtAttribute {
+                        tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                        ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(), trgt_ccy: "".to_string(),
+                            unit_ccy: "".to_string(), xchg_rate: "".to_string() } }, amt: "".to_string() },
+                    bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
+                        fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } }, prtry:
+                    PrtryAttribute { cd: "".to_string(), issr: "".to_string() } }, rltd_pties: RltdPtiesAttribute {
+                        dbtr: DbtrAttribute { id: PrvtIdAttribute { othr: IdDtldAttribute {
+                            id: "".to_string() } }, nm: "".to_string(), pstl_adr: PostalAddressAttribute {
+                            strt_nm: "".to_string(), bldg_nb: "".to_string(), pst_cd: "".to_string(),
+                            twn_nm: "".to_string(), ctry: "".to_string(), adr_line: Vec::new() } }, dbtr_acct: IdTxDtlsAttribute {
+                            id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute {
+                                id: "".to_string(), schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                            other: IdDtldAttribute { id: "".to_string() } }, cdtr: CdtrAttribue {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                            nm: "GOLDMAN".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(),
+                                twn_nm: "".to_string(), ctry: "".to_string(), adr_line: Vec::new() } },
+                        cdtr_acct: IdTxDtlsAttribute { id: IdIbanAttribute { iban: "".to_string(),
+                            othr: OtherAttribute { id: "".to_string(), schme_nm: ShemeNumberAttribute {
+                                cd: "".to_string() } } }, other: IdDtldAttribute { id: "107045863".to_string() } } },
+                    rltd_agts: CdtrAgtAttribute { cdtr_agt: SvcrAttribute {
+                        fin_instn_id: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(),
+                            nm: "".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(),
+                                twn_nm: "".to_string(), ctry: "".to_string(),
+                                adr_line: Vec::new() } } }, dbtr_agt: SvcrAttribute {
+                        fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string(),
+                            pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                                adr_line: Vec::new() } } } }, rmt_inf: RmtInfAttribute {
+                        ustrd: vec!["The".to_string()], strd: StrdAttribute { cdtr_ref_inf: CdtrRefInfAttribute {
+                            tp: CdOrPrtryAttribute { cd_or_prtry: CdAttribute { cd: "".to_string() } },
+                            ref_cdtr: "".to_string() } } }, rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
+                    addtl_tx_inf: "Tag".to_string() }] } }];
         assert_eq!(ntry_test, result);
     }
     #[test]
@@ -496,30 +542,44 @@ mod tests {
                                :28C:49/2
                                :60M:C250218USD2732398848,02".to_string();
         DocumentMt940::parse_field_foo(&document, &mut result);
-        let test = BkToCstmrStmt { grp_hdr: HeaderAttribute { msg_id: "".to_string(), cre_dt_tm: "".to_string() },
-            stmt: StatementAttribute { id: "".to_string(), elctrnc_seq_nb: "49".to_string(),
-                lgl_seq_nb: "2".to_string(), cre_dt_tm: "".to_string(), fr_to_dt: FromToDtAttribute {
-                    fr_dt_tm: "".to_string(), to_dt_tm: "".to_string() }, acct: AcctAttribute {
-                    id: IdIbanAttribute { iban: "".to_string(),
-                        othr: OtherAttribute { id: "".to_string(), schme_nm: ShemeNumberAttribute {
-                            cd: "".to_string() } } }, ccy: "".to_string(), nm: "".to_string(),
-                    ownr: OwnerAttribute { nm: "".to_string(),
-                        pstl_adr: PostalAddressAttribute { strt_nm: "".to_string() }, bldg_nb: 0,
-                        pst_cd: 0, twn_nm: "".to_string(), ctry: "".to_string(), id: IdAttribute {
-                            org_id: OrgIdAttribute { othr: OtherAttribute {
-                                id: "107048825".to_string(), schme_nm: ShemeNumberAttribute {
-                                    cd: "".to_string() } } } } }, svcr: SvcrAttribute {
-                        fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string() } } },
-                bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
-                    cd_or_prtry: CdAttribute { cd: "OPAV".to_string() } },
-                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
-                    dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
-                txs_summry: TxsSummryAttribute { ttl_ntries: TtlNtriesAttribute {
-                    nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0, cdt_dbt_ind: "".to_string() },
-                    ttl_cdt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0, sum: "".to_string() },
-                    ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0, sum: "".to_string() } },
-                ntry: Vec::new() } };
-        assert_eq!(test, result);
+        let test = BkToCstmrStmt { grp_hdr: HeaderAttribute {
+            msg_id: "".to_string(), cre_dt_tm: "".to_string() }, stmt: StatementAttribute {
+            id: "".to_string(), elctrnc_seq_nb: "49".to_string(), lgl_seq_nb: "2".to_string(),
+            cre_dt_tm: "".to_string(), fr_to_dt: FromToDtAttribute {
+                fr_dt_tm: "".to_string(), to_dt_tm: "".to_string() },
+            acct: AcctAttribute { id: IdIbanAttribute {
+                iban: "".to_string(), othr: OtherAttribute {
+                    id: "".to_string(), schme_nm: ShemeNumberAttribute {
+                        cd: "".to_string() } } }, ccy: "".to_string(),
+                nm: "".to_string(), ownr: OwnerAttribute { nm: "".to_string(),
+                    pstl_adr: PostalAddressAttribute {
+                        strt_nm: "".to_string(), bldg_nb: "".to_string(),
+                        pst_cd: "".to_string(), twn_nm: "".to_string(),
+                        ctry: "".to_string(), adr_line: Vec::new() },
+                    bldg_nb: 0, pst_cd: 0,
+                    twn_nm: "".to_string(), ctry: "".to_string(),
+                    id: IdAttribute {
+                        org_id: OrgIdAttribute {
+                            othr: OtherAttribute { id: "107048825".to_string(),
+                                schme_nm: ShemeNumberAttribute {
+                                    cd: "".to_string() } } } } },
+                svcr: SvcrAttribute { fin_instn_id: FinInstIdAttribute {
+                    bic: "".to_string(), nm: "".to_string(), pstl_adr: PostalAddressAttribute {
+                        strt_nm: "".to_string(), bldg_nb: "".to_string(), pst_cd: "".to_string(),
+                        twn_nm: "".to_string(), ctry: "".to_string(), adr_line: Vec::new() },  } } },
+            bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
+                cd_or_prtry: CdAttribute { cd: "OPAV".to_string() } },
+                amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
+                cdt_dbt_ind: "".to_string(), dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
+            txs_summry: TxsSummryAttribute {
+                ttl_ntries: TtlNtriesAttribute {
+                    nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0,
+                    cdt_dbt_ind: "" .to_string()}, ttl_cdt_ntries: TtlCdtDbtNtriesAttribute {
+                    nb_of_ntries: 0, sum: "".to_string() },
+                ttl_dbt_ntries: TtlCdtDbtNtriesAttribute {
+                    nb_of_ntries: 0, sum: "".to_string() } }, ntry: Vec::new() } };
+
+           assert_eq!(test, result);
     }
     #[test]
     fn test_parse_one_record(){
@@ -547,88 +607,157 @@ mod tests {
                 elctrnc_seq_nb: "49".to_string(), lgl_seq_nb: "2".to_string(), cre_dt_tm: "".to_string(),
                 fr_to_dt: FromToDtAttribute { fr_dt_tm: "".to_string(), to_dt_tm: "".to_string() },
                 acct: AcctAttribute { id: IdIbanAttribute { iban: "".to_string(),
-                    othr: OtherAttribute { id: "".to_string(),
-                        schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
-                    ccy: "".to_string(), nm: "".to_string(), ownr: OwnerAttribute {
-                        nm: "".to_string(), pstl_adr: PostalAddressAttribute {
-                            strt_nm: "".to_string() }, bldg_nb: 0,
+                    othr: OtherAttribute { id: "".to_string(), schme_nm: ShemeNumberAttribute {
+                        cd: "".to_string() } } }, ccy: "".to_string(), nm: "".to_string(),
+                    ownr: OwnerAttribute { nm: "".to_string(),
+                        pstl_adr: PostalAddressAttribute {
+                            strt_nm: "".to_string(), bldg_nb: "".to_string(),
+                            pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                            adr_line: Vec::new() }, bldg_nb: 0,
                         pst_cd: 0, twn_nm: "".to_string(), ctry: "".to_string(),
                         id: IdAttribute { org_id: OrgIdAttribute {
                             othr: OtherAttribute { id: "107048825".to_string(),
                                 schme_nm: ShemeNumberAttribute {
                                     cd: "".to_string() } } } } },
                     svcr: SvcrAttribute { fin_instn_id: FinInstIdAttribute {
-                        bic: "GSCRUS30XXXX".to_string(), nm: "".to_string() } } },
+                        bic: "GSCRUS30XXXX".to_string(), nm: "".to_string(),
+                        pstl_adr: PostalAddressAttribute {
+                            strt_nm: "".to_string(), bldg_nb: "".to_string(),
+                            pst_cd: "".to_string(), twn_nm: "".to_string(),
+                            ctry: "".to_string(), adr_line: Vec::new() } } } },
                 bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
                     cd_or_prtry: CdAttribute { cd: "OPAV".to_string() } },
                     amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
-                    dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
-                txs_summry: TxsSummryAttribute { ttl_ntries: TtlNtriesAttribute {
-                    nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0,
-                    cdt_dbt_ind: "".to_string() }, ttl_cdt_ntries: TtlCdtDbtNtriesAttribute {
-                    nb_of_ntries: 0, sum: "".to_string() },
-                    ttl_dbt_ntries: TtlCdtDbtNtriesAttribute { nb_of_ntries: 0,
-                        sum: "".to_string() } }, ntry: vec![NtryAttribute { ntry_ref: 0,
-                    amt: AmtAttribute{amt: "12.01".to_string(), ccy: "USD".to_string()}, cdt_dbt_ind: "DBIT".to_string(),
-                    sts: "".to_string(), bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
+                    cdt_dbt_ind: "".to_string(), dt: DtAttribute { dt: "2025-02-18".to_string() },
+                    cd: "C".to_string() }], txs_summry: TxsSummryAttribute {
+                    ttl_ntries: TtlNtriesAttribute { nb_of_ntries: "".to_string(),
+                        ttl_net_ntry_amt: 0.0, cdt_dbt_ind: "".to_string() },
+                    ttl_cdt_ntries: TtlCdtDbtNtriesAttribute {
+                        nb_of_ntries: 0, sum: "".to_string() },
+                    ttl_dbt_ntries: TtlCdtDbtNtriesAttribute {
+                        nb_of_ntries: 0, sum: "".to_string() } },
+                ntry: vec![NtryAttribute { ntry_ref: 0,
+                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "12.01".to_string() },
+                    cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(), bookg_dt: DtAttribute {
+                        dt: "2025-02-18".to_string() }, val_dt: DtAttribute { dt: "2025-02-18".to_string() },
+                    acct_svcr_ref: "".to_string(), bk_tx_cd: BxTxCdAttribute {
+                        domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute {
+                            cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                        prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+                    addtl_inf_ind: AddtlTxInfAtttribute { msg_nm_id: "".to_string() },
+                    ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute {
+                        nb_of_txs: 0 }, tx_dtls: vec![TxDtlsAttribute {
+                        refs: EndToEndIdAttribute { pmt_inf_id: "".to_string(),
+                            instr_id: "".to_string(), end_to_end_id: "GSLNVSHSUTKWDR".to_string(),
+                            tx_id: "".to_string(), prtry: PrtryDetAttribute { tp: "".to_string(),
+                                refdt: "".to_string() } }, amt_dtls: TxAmtAttribute {
+                            end_to_end_id: "".to_string(), instd_amt: PrtryAmtAttribute {
+                                tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                                ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(),
+                                    trgt_ccy: "".to_string(), unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                            tx_amt: PrtryAmtAttribute { tp: "".to_string(), amt: AmtAttribute {
+                                ccy: "".to_string(), amt: "".to_string() }, ccy_xchg: CcyXchgAttribute {
+                                src_ccy: "".to_string(), trgt_ccy: "".to_string(), unit_ccy: "".to_string(),
+                                xchg_rate: "".to_string() } }, prtry_amt: PrtryAmtAttribute {
+                                tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                                ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(),
+                                    trgt_ccy: "".to_string(), unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                            amt: "".to_string() }, bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute {
+                            cd: "".to_string(), fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                            prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                        rltd_pties: RltdPtiesAttribute { dbtr: DbtrAttribute {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute {
+                                id: "".to_string() } }, nm: "".to_string(), pstl_adr: PostalAddressAttribute {
+                                strt_nm: "".to_string(), bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                ctry: "".to_string(), adr_line: Vec::new() } }, dbtr_acct: IdTxDtlsAttribute {
+                            id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute { id: "".to_string(),
+                                schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                            other: IdDtldAttribute { id: "".to_string() } }, cdtr: CdtrAttribue {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                            nm: "GOLDMAN".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                ctry: "".to_string(), adr_line: Vec::new()} },
+                            cdtr_acct: IdTxDtlsAttribute { id: IdIbanAttribute { iban: "".to_string(),
+                                othr: OtherAttribute { id: "".to_string(), schme_nm: ShemeNumberAttribute {
+                                    cd: "".to_string() } } }, other: IdDtldAttribute { id: "107045863".to_string() } } },
+                        rltd_agts: CdtrAgtAttribute { cdtr_agt: SvcrAttribute { fin_instn_id:
+                        FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string(),
+                            pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                                adr_line: Vec::new() } } }, dbtr_agt: SvcrAttribute {
+                            fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string(),
+                                pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                    bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                    ctry: "".to_string(),
+                                    adr_line: Vec::new() } } } }, rmt_inf: RmtInfAttribute {
+                            ustrd: vec!["USD".to_string()], strd: StrdAttribute { cdtr_ref_inf:
+                            CdtrRefInfAttribute { tp: CdOrPrtryAttribute { cd_or_prtry:
+                            CdAttribute { cd: "".to_string() } }, ref_cdtr: "".to_string() } } },
+                        rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
+                        addtl_tx_inf: "Tag".to_string() }] } }, NtryAttribute { ntry_ref: 0,
+                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "12.01".to_string() }, cdt_dbt_ind:
+                    "DBIT".to_string(), sts: "".to_string(), bookg_dt: DtAttribute { dt: "2025-02-18".to_string() },
                     val_dt: DtAttribute { dt: "2025-02-18".to_string() }, acct_svcr_ref: "".to_string(),
                     bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
                         fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
                         prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+                    addtl_inf_ind: AddtlTxInfAtttribute { msg_nm_id: "".to_string() },
                     ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute {
-                        nb_of_txs: 0, tx_dtls: vec![TxDtlsAttribute {
-                            refs: EndToEndIdAttribute { end_to_end_id: "GSLNVSHSUTKWDR".to_string(),
-                                prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
-                            amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
-                            bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
-                                fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
-                                prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
-                            rltd_pties: RltdPtiesAttribute { cdtr_acct: IdTxDtlsAttribute {
-                                id: "".to_string(), other: IdDtldAttribute { id: "107045863".to_string() } },
-                                dbtr_acct: IdTxDtlsAttribute { id: "".to_string(),
-                                    other: IdDtldAttribute { id: "".to_string() } },
-                                cdtr: CdtrAttribue { id: PrvtIdAttribute {
-                                    othr: IdDtldAttribute { id: "".to_string() } },
-                                    nm: "GOLDMAN".to_string() }, dbtr: DbtrAttribute {
-                                    id: PrvtIdAttribute { othr: IdDtldAttribute {
-                                        id: "".to_string() } }, nm: "".to_string() } },
-                            rmt_inf: RmtInfAttribute { strd: CdtrRefInfAttribute {
-                                tp: CdOrPrtryAttribute { cd_or_prtry: CdAttribute {
-                                    cd: "".to_string() } }, ref_cdtr: "".to_string() }, ustrd: "USD".to_string() },
-                            rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
-                            rltd_agts: CdtrAgtAttribute { cdtr_agt: FinInstIdAttribute {
-                                bic: "GSCRUS30XXX".to_string(), nm: "".to_string() }, dbtr_agt: FinInstIdAttribute {
-                                bic: "".to_string(), nm: "" .to_string()} }, addtl_tx_inf: "Tag".to_string() }] } } },
-                    NtryAttribute { ntry_ref: 0, amt: AmtAttribute{amt: "12.01".to_string(), ccy: "USD".to_string()},
-                        cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(), bookg_dt: DtAttribute {
-                            dt: "2025-02-18".to_string() }, val_dt: DtAttribute { dt: "2025-02-18".to_string() },
-                        acct_svcr_ref: "".to_string(), bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute {
+                        nb_of_txs: 0 }, tx_dtls: vec![TxDtlsAttribute {
+                        refs: EndToEndIdAttribute { pmt_inf_id: "".to_string(),
+                            instr_id: "".to_string(), end_to_end_id: "GSOXWBAQYTF4VH".to_string(),
+                            tx_id: "".to_string(), prtry: PrtryDetAttribute { tp: "".to_string(),
+                                refdt: "".to_string() } }, amt_dtls: TxAmtAttribute {
+                            end_to_end_id: "".to_string(), instd_amt: PrtryAmtAttribute {
+                                tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                                ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(),
+                                    trgt_ccy: "".to_string(), unit_ccy: "".to_string(),
+                                    xchg_rate: "".to_string() } },
+                            tx_amt: PrtryAmtAttribute { tp: "".to_string(), amt: AmtAttribute {
+                                ccy: "".to_string(), amt: "".to_string() }, ccy_xchg: CcyXchgAttribute {
+                                src_ccy: "".to_string(), trgt_ccy: "".to_string(),
+                                unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                            prtry_amt: PrtryAmtAttribute { tp: "".to_string(), amt: AmtAttribute {
+                                ccy: "".to_string(), amt: "".to_string() }, ccy_xchg: CcyXchgAttribute {
+                                src_ccy: "".to_string(), trgt_ccy: "".to_string(),
+                                unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                            amt: "".to_string() }, bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute {
                             cd: "".to_string(), fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
-                            prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
-                        ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute { nb_of_txs: 0,
-                            tx_dtls: vec![TxDtlsAttribute {
-                                refs: EndToEndIdAttribute { end_to_end_id: "GSOXWBAQYTF4VH".to_string(),
-                                    prtry: PrtryDetAttribute { tp: "".to_string(), refdt: "".to_string() } },
-                                amt_dtls: TxAmtAttribute { end_to_end_id: "".to_string(), amt: "".to_string() },
-                                bx_tx_cd: BxTxCdAttribute { domn: DomnAttribute { cd: "".to_string(),
-                                    fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
-                                    prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
-                                rltd_pties: RltdPtiesAttribute { cdtr_acct: IdTxDtlsAttribute {
-                                    id: "".to_string(), other: IdDtldAttribute { id: "107045863".to_string() } },
-                                    dbtr_acct: IdTxDtlsAttribute { id: "".to_string(),
-                                        other: IdDtldAttribute { id: "".to_string() } },
-                                    cdtr: CdtrAttribue { id: PrvtIdAttribute {
-                                        othr: IdDtldAttribute { id: "".to_string() } },
-                                        nm: "GOLDMAN".to_string() }, dbtr: DbtrAttribute {
-                                        id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
-                                        nm: "".to_string() } }, rmt_inf: RmtInfAttribute {
-                                    strd: CdtrRefInfAttribute { tp: CdOrPrtryAttribute {
-                                        cd_or_prtry: CdAttribute { cd: "".to_string() } }, ref_cdtr: "".to_string() },
-                                    ustrd: "The".to_string() }, rltd_dts: RltdDtsAttribute {
-                                    accptnc_dt_tm: "".to_string() }, rltd_agts: CdtrAgtAttribute {
-                                    cdtr_agt: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(),
-                                        nm: "".to_string() }, dbtr_agt: FinInstIdAttribute {
-                                        bic: "".to_string(), nm: "".to_string() } }, addtl_tx_inf: "Tag".to_string() }] } } }] } };
+                            prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                        rltd_pties: RltdPtiesAttribute { dbtr: DbtrAttribute {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                            nm: "".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                                adr_line: Vec::new()} }, dbtr_acct: IdTxDtlsAttribute {
+                            id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute {
+                                id: "".to_string(), schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                            other: IdDtldAttribute { id: "".to_string() } }, cdtr: CdtrAttribue {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                            nm: "GOLDMAN".to_string(), pstl_adr: PostalAddressAttribute {
+                                strt_nm: "".to_string(), bldg_nb: "".to_string(),
+                                pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                ctry: "".to_string(), adr_line: Vec::new() } }, cdtr_acct: IdTxDtlsAttribute {
+                            id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute { id: "".to_string(),
+                                schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                            other: IdDtldAttribute { id: "107045863".to_string() } } },
+                        rltd_agts: CdtrAgtAttribute { cdtr_agt: SvcrAttribute {
+                            fin_instn_id: FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(),
+                                nm: "".to_string(),
+                                pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                    bldg_nb: "".to_string(), pst_cd: "".to_string(),
+                                    twn_nm: "".to_string(), ctry: "".to_string(),
+                                    adr_line: Vec::new() } } }, dbtr_agt: SvcrAttribute {
+                            fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string(),
+                                pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                    bldg_nb: "".to_string(), pst_cd: "".to_string(),
+                                    twn_nm: "".to_string(), ctry: "".to_string(),
+                                    adr_line: Vec::new() } } } }, rmt_inf: RmtInfAttribute {
+                            ustrd: vec!["The".to_string()], strd: StrdAttribute { cdtr_ref_inf:
+                            CdtrRefInfAttribute { tp: CdOrPrtryAttribute {
+                                cd_or_prtry: CdAttribute { cd: "".to_string() } },
+                                ref_cdtr: "".to_string() } } },
+                        rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
+                        addtl_tx_inf: "Tag".to_string() }] } }] } };
         assert_eq!(test, result);
     }
     #[test]
@@ -643,17 +772,26 @@ mod tests {
                         schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
                     ccy: "".to_string(), nm: "".to_string(), ownr: OwnerAttribute {
                         nm: "".to_string(), pstl_adr: PostalAddressAttribute {
-                            strt_nm: "".to_string() }, bldg_nb: 0,
+                            strt_nm: "".to_string(),
+                            bldg_nb: "".to_string(),
+                            pst_cd: "".to_string(),
+                            twn_nm: "".to_string(),
+                            ctry: "".to_string(),
+                            adr_line: vec![],
+                        }, bldg_nb: 0,
                         pst_cd: 0, twn_nm: "".to_string(), ctry: "".to_string(),
                         id: IdAttribute { org_id: OrgIdAttribute {
                             othr: OtherAttribute { id: "107048825".to_string(),
                                 schme_nm: ShemeNumberAttribute {
                                     cd: "".to_string() } } } } },
                     svcr: SvcrAttribute { fin_instn_id: FinInstIdAttribute {
-                        bic: "GSCRUS30XXXX".to_string(), nm: "".to_string() } } },
+                        bic: "GSCRUS30XXXX".to_string(), nm: "".to_string(),
+                        pstl_adr: Default::default(),
+                    } } },
                 bal: vec![BalanceAttribute { tp: TpBalanceAttribute {
                     cd_or_prtry: CdAttribute { cd: "OPAV".to_string() } },
                     amt: AmtAttribute { ccy: "USD".to_string(), amt: "2732398848.02".to_string() },
+                    cdt_dbt_ind: "".to_string(),
                     dt: DtAttribute { dt: "2025-02-18".to_string() }, cd: "C".to_string() }],
                 txs_summry: TxsSummryAttribute { ttl_ntries: TtlNtriesAttribute {
                     nb_of_ntries: "".to_string(), ttl_net_ntry_amt: 0.0,
@@ -667,6 +805,69 @@ mod tests {
     }
     #[test]
     fn test_extract_field_61_86_mt940(){
-        
+        let vec_camt = vec![NtryAttribute { ntry_ref: 0,
+                    amt: AmtAttribute { ccy: "USD".to_string(), amt: "12.01".to_string() },
+                    cdt_dbt_ind: "DBIT".to_string(), sts: "".to_string(), bookg_dt: DtAttribute {
+                        dt: "2025-02-18".to_string() }, val_dt: DtAttribute { dt: "2025-02-18".to_string() },
+                    acct_svcr_ref: "".to_string(), bk_tx_cd: BxTxCdAttribute {
+                        domn: DomnAttribute { cd: "".to_string(), fmly: FmlyAttribute {
+                            cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                        prtry: PrtryAttribute { cd: "NTRF".to_string(), issr: "".to_string() } },
+                    addtl_inf_ind: AddtlTxInfAtttribute { msg_nm_id: "".to_string() },
+                    ntry_dtls: NtryDtlsAttribute { btch: BtchAttribute {
+                        nb_of_txs: 0 }, tx_dtls: vec![TxDtlsAttribute {
+                        refs: EndToEndIdAttribute { pmt_inf_id: "".to_string(),
+                            instr_id: "".to_string(), end_to_end_id: "GSLNVSHSUTKWDR".to_string(),
+                            tx_id: "".to_string(), prtry: PrtryDetAttribute { tp: "".to_string(),
+                                refdt: "".to_string() } }, amt_dtls: TxAmtAttribute {
+                            end_to_end_id: "".to_string(), instd_amt: PrtryAmtAttribute {
+                                tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                                ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(),
+                                    trgt_ccy: "".to_string(), unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                            tx_amt: PrtryAmtAttribute { tp: "".to_string(), amt: AmtAttribute {
+                                ccy: "".to_string(), amt: "".to_string() }, ccy_xchg: CcyXchgAttribute {
+                                src_ccy: "".to_string(), trgt_ccy: "".to_string(), unit_ccy: "".to_string(),
+                                xchg_rate: "".to_string() } }, prtry_amt: PrtryAmtAttribute {
+                                tp: "".to_string(), amt: AmtAttribute { ccy: "".to_string(), amt: "".to_string() },
+                                ccy_xchg: CcyXchgAttribute { src_ccy: "".to_string(),
+                                    trgt_ccy: "".to_string(), unit_ccy: "".to_string(), xchg_rate: "".to_string() } },
+                            amt: "".to_string() }, bk_tx_cd: BxTxCdAttribute { domn: DomnAttribute {
+                            cd: "".to_string(), fmly: FmlyAttribute { cd: "".to_string(), sub_fmly_cd: "".to_string() } },
+                            prtry: PrtryAttribute { cd: "".to_string(), issr: "".to_string() } },
+                        rltd_pties: RltdPtiesAttribute { dbtr: DbtrAttribute {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute {
+                                id: "".to_string() } }, nm: "".to_string(), pstl_adr: PostalAddressAttribute {
+                                strt_nm: "".to_string(), bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                ctry: "".to_string(), adr_line: Vec::new() } }, dbtr_acct: IdTxDtlsAttribute {
+                            id: IdIbanAttribute { iban: "".to_string(), othr: OtherAttribute { id: "".to_string(),
+                                schme_nm: ShemeNumberAttribute { cd: "".to_string() } } },
+                            other: IdDtldAttribute { id: "".to_string() } }, cdtr: CdtrAttribue {
+                            id: PrvtIdAttribute { othr: IdDtldAttribute { id: "".to_string() } },
+                            nm: "GOLDMAN".to_string(), pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                ctry: "".to_string(), adr_line: Vec::new()} },
+                            cdtr_acct: IdTxDtlsAttribute { id: IdIbanAttribute { iban: "".to_string(),
+                                othr: OtherAttribute { id: "".to_string(), schme_nm: ShemeNumberAttribute {
+                                    cd: "".to_string() } } }, other: IdDtldAttribute { id: "107045863".to_string() } } },
+                        rltd_agts: CdtrAgtAttribute { cdtr_agt: SvcrAttribute { fin_instn_id:
+                        FinInstIdAttribute { bic: "GSCRUS30XXX".to_string(), nm: "".to_string(),
+                            pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(), ctry: "".to_string(),
+                                adr_line: Vec::new() } } }, dbtr_agt: SvcrAttribute {
+                            fin_instn_id: FinInstIdAttribute { bic: "".to_string(), nm: "".to_string(),
+                                pstl_adr: PostalAddressAttribute { strt_nm: "".to_string(),
+                                    bldg_nb: "".to_string(), pst_cd: "".to_string(), twn_nm: "".to_string(),
+                                    ctry: "".to_string(),
+                                    adr_line: Vec::new() } } } }, rmt_inf: RmtInfAttribute {
+                            ustrd: vec!["USD".to_string()], strd: StrdAttribute { cdtr_ref_inf:
+                            CdtrRefInfAttribute { tp: CdOrPrtryAttribute { cd_or_prtry:
+                            CdAttribute { cd: "".to_string() } }, ref_cdtr: "".to_string() } } },
+                        rltd_dts: RltdDtsAttribute { accptnc_dt_tm: "".to_string() },
+                        addtl_tx_inf: "Tag".to_string() }] } }];
+        let mut result = String::new();
+        let test = ":61:2502180218D12,01NTRFGSLNVSHSUTKWDR \n:86:/NREF/GSLNVSHSUTKWDR\n\
+        /CRNM/GOLDMAN\n/CACT/107045863\n/CBIC/GSCRUS30XXX\n/REMI/USD/\n/OPRP/Tag\n";
+        DocumentMt940::extract_field_61_86_mt940(&vec_camt, &mut result);
+        assert_eq!(test, result);
     }
 }
