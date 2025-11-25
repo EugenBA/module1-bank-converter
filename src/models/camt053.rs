@@ -26,7 +26,7 @@ pub(crate) struct HeaderAttribute{
 pub(crate)  struct StatementAttribute{
     pub(crate) id: String, //id
     pub(crate) elctrnc_seq_nb: String, //ElctrncSeqNb
-    pub(crate) lgl_seq_nv: String, //LglSeqNb
+    pub(crate) lgl_seq_nb: String, //LglSeqNb
     pub(crate) cre_dt_tm: String, //CreDtTm
     pub(crate) fr_to_dt: FromToDtAttribute, //FrToDt
     pub(crate) acct: AcctAttribute, //Acct
@@ -46,7 +46,7 @@ pub (crate) struct NtryAttribute{
     pub(crate) bookg_dt: DtAttribute, //BookgDt
     pub(crate) val_dt: DtAttribute, //ValDt
     pub(crate) acct_svcr_ref: String, //AcctSvcrRef
-    pub(crate) bx_tx_cd: BxTxCdAttribute, //BkTxCd
+    pub(crate) bk_tx_cd: BxTxCdAttribute, //BkTxCd
     pub(crate) ntry_dtls: NtryDtlsAttribute//NtryDtls
 
 }
@@ -55,37 +55,40 @@ pub (crate) struct NtryAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct NtryDtlsAttribute{
     pub(crate) btch: BtchAttribute, //Btch
+    pub(crate) tx_dtls: Vec<TxDtlsAttribute>//TxDtls
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct BtchAttribute{
     pub(crate) nb_of_txs: u32, //NbOfTxs
-   pub(crate) tx_dtls: Vec<TxDtlsAttribute>//TxDtls
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct TxDtlsAttribute {
     pub(crate) refs: EndToEndIdAttribute, //Refs
     pub(crate) amt_dtls: TxAmtAttribute, //AmtDtls
-    pub(crate) bx_tx_cd: BxTxCdAttribute, //BxTxCd
+    pub(crate) bk_tx_cd: BxTxCdAttribute, //BxTxCd
+    pub(crate) addtl_tx_inf: String, //AddtlTxInf
     pub(crate) rltd_pties: RltdPtiesAttribute, //RltdPties
+    pub(crate) rltd_agts: CdtrAgtAttribute, //RltdAgts
     pub(crate) rmt_inf: RmtInfAttribute, //RmtInf
     pub(crate) rltd_dts: RltdDtsAttribute, //RltdDts
-    pub(crate) rltd_agts: CdtrAgtAttribute, //RltdAgts
-    pub(crate) addtl_tx_inf: String, //AddtlTxInf
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct CdtrAgtAttribute{
-    pub(crate) cdtr_agt: FinInstIdAttribute,
-    pub(crate) dbtr_agt: FinInstIdAttribute,
+    pub(crate) cdtr_agt: SvcrAttribute,
+    pub(crate) dbtr_agt: SvcrAttribute,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct EndToEndIdAttribute{
+    pub(crate) pmt_inf_id: String, //PmtInfId
+    pub(crate) instr_id: String,//InstrId
     pub(crate) end_to_end_id: String,
+    pub(crate) tx_id: String,
     pub(crate) prtry: PrtryDetAttribute
 }
 
@@ -101,23 +104,46 @@ pub(crate) struct PrtryDetAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct TxAmtAttribute{
     pub(crate) end_to_end_id: String,
+    pub(crate) instd_amt: PrtryAmtAttribute,
+    pub(crate) tx_amt: PrtryAmtAttribute, //TxAmt
+    pub(crate) prtry_amt: PrtryAmtAttribute,//PrtryAmt
     pub(crate) amt: String,
+}
+
+
+
+#[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "PascalCase", default)]
+pub(crate) struct PrtryAmtAttribute{
+    pub(crate) tp: String,
+    pub(crate) amt: AmtAttribute,
+    pub(crate) ccy_xchg: CcyXchgAttribute
+}
+
+#[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "PascalCase", default)]
+pub(crate) struct CcyXchgAttribute{
+    pub(crate) src_ccy: String, //SrcCcy
+    pub(crate) trgt_ccy: String, //TrgtCcy
+    pub(crate) unit_ccy: String, //UnitCcy
+    pub(crate) xchg_rate: String //XchgRate
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct RltdPtiesAttribute{
-    pub(crate) cdtr_acct: IdTxDtlsAttribute,
+    pub(crate) dbtr: DbtrAttribute,
     pub(crate) dbtr_acct: IdTxDtlsAttribute,
     pub(crate) cdtr: CdtrAttribue,
-    pub(crate) dbtr: DbtrAttribute,
+    pub(crate) cdtr_acct: IdTxDtlsAttribute,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct DbtrAttribute{
     pub(crate) id: PrvtIdAttribute,
-    pub(crate) nm: String
+    pub(crate) nm: String,
+    pub(crate) pstl_adr: PostalAddressAttribute
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
@@ -131,26 +157,37 @@ pub(crate) struct PrvtIdAttribute {
 pub(crate) struct CdtrAttribue{
     pub(crate) id: PrvtIdAttribute,
     pub(crate) nm: String,
+    pub(crate) pstl_adr: PostalAddressAttribute //PstlAdr
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct RmtInfAttribute{
-    pub(crate) strd: CdtrRefInfAttribute,
-    pub(crate) ustrd: String
+    pub(crate) ustrd: Vec<String>,
+    pub(crate) strd: StrdAttribute
+
+}
+
+#[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
+#[serde(rename_all = "PascalCase", default)]
+pub(crate) struct StrdAttribute {
+   pub(crate) cdtr_ref_inf: CdtrRefInfAttribute //CdrtRefInf
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct RltdDtsAttribute{
-    pub(crate) accpt_nc_dt_tm: String,
+    pub(crate) accptnc_dt_tm: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
-#[serde(rename_all = "PascalCase", default)]
+#[serde(default)]
 pub(crate) struct CdtrRefInfAttribute{
+    #[serde(rename="Tp")]
     pub(crate) tp: CdOrPrtryAttribute,//Tp
+    #[serde(rename="Ref")]
     pub(crate) ref_cdtr: String //Ref
+
 }
 
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
@@ -162,7 +199,7 @@ pub(crate) struct CdOrPrtryAttribute{
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct IdTxDtlsAttribute{
-    pub(crate) id: String, //Id
+    pub(crate) id: IdIbanAttribute, //Id
     pub(crate) other: IdDtldAttribute//Other
 }
 
@@ -239,6 +276,7 @@ pub(crate) struct TtlCdtDbtNtriesAttribute{
 pub(crate) struct BalanceAttribute{
     pub(crate) tp: TpBalanceAttribute, // tp
     pub(crate) amt: AmtAttribute,
+    pub(crate) cdt_dbt_ind: String, //CdtDbtInd
     pub(crate) dt:  DtAttribute,
     #[serde(skip_serializing)]
     pub(crate) cd: String
@@ -251,7 +289,7 @@ pub(crate) struct DtAttribute{
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct TpBalanceAttribute{
-    pub(crate) cd_or_party: CdAttribute
+    pub(crate) cd_or_prtry: CdAttribute
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
@@ -293,14 +331,16 @@ pub(crate)  struct SvcrAttribute{
 pub(crate)  struct FinInstIdAttribute{
     #[serde(rename = "BIC")]
     pub(crate) bic: String, //BIC
-    #[serde(rename = "PascalCase")]
-    pub(crate) nm: String
+    #[serde(rename = "Nm")]
+    pub(crate) nm: String,
+    #[serde(rename = "PstlAdr")]
+    pub(crate) pstl_adr: PostalAddressAttribute
 }
 #[derive(Debug, Deserialize, Serialize, Default, PartialEq)]
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct OwnerAttribute{
     pub(crate) nm: String, //nm
-    pub(crate) pstl_addr: PostalAddressAttribute, //pstl_addr
+    pub(crate) pstl_adr: PostalAddressAttribute, //pstl_addr
     pub(crate) bldg_nb: u32, //BldgNb
     pub(crate) pst_cd: u32, //PstCd
     pub(crate) twn_nm: String, //TwnNm
@@ -333,7 +373,11 @@ pub(crate) struct ShemeNumberAttribute{
 #[serde(rename_all = "PascalCase", default)]
 pub(crate) struct PostalAddressAttribute{
     pub(crate) strt_nm: String, //strt_nm
-
+    pub(crate) bldg_nb: String, //BldgNb
+    pub(crate) pst_cd: String, //PstCd
+    pub(crate) twn_nm: String, //TwnNm
+    pub(crate) ctry: String,
+    pub(crate) adr_line: Vec<String>
 }
 
 impl Default for DocumentCamt053{

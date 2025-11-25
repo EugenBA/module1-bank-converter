@@ -103,9 +103,9 @@ fn main() {
     let mut in_file = String::new();
     let mut out_file = String::new();
     args.push(String::from("-i"));
-    args.push(String::from("/mnt/ssd_data/RustProject/bank-converter/test_files/camt 053 danske bank.txt"));
+    args.push(String::from("/home/eugen/RustProject/bank-converter/test_files/camt 053 danske bank.txt"));
     args.push(String::from("-o"));
-    args.push(String::from("/mnt/ssd_data/RustProject/bank-converter/test_files/MT940.txt"));
+    args.push(String::from("/home/eugen/RustProject/bank-converter/test_files/camt053.xml"));
     args.push(String::from("--in_format"));
     args.push(String::from("CAMT053"));
     args.push(String::from("--out_format"));

@@ -72,7 +72,7 @@ impl DocumentMt940 {
             record_write.push_str(":28C:");
             record_write.push_str(&record.stmt.elctrnc_seq_nb);
             record_write.push_str("/");
-            record_write.push_str(&record.stmt.lgl_seq_nv);
+            record_write.push_str(&record.stmt.lgl_seq_nb);
             record_write.push_str("\n");
             DocumentMt940::extract_field_6x_mt940(&record, &mut record_write);
             DocumentMt940::extract_field_61_86_mt940(&record.stmt.ntry, &mut record_write);

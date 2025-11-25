@@ -89,8 +89,8 @@ impl DocumentCsv {
         if let Ok(regexp) = reg_pattern {
             if let Some(capture) = regexp.captures(val)
             {
-                ntry_det.rltd_agts.dbtr_agt.bic = capture[1].to_string();
-                ntry_det.rltd_agts.dbtr_agt.nm = capture[2].to_string();
+                ntry_det.rltd_agts.dbtr_agt.fin_instn_id.bic = capture[1].to_string();
+                ntry_det.rltd_agts.dbtr_agt.fin_instn_id.nm = capture[2].to_string();
             }
         }
     }
@@ -149,8 +149,8 @@ impl DocumentCsv {
                 ntry.cdt_dbt_ind =  "DBIT".to_string();
                 ntry.amt.amt = row.j.to_string();
             }
-            ntry.bx_tx_cd.prtry.cd = row.q.to_string();
-            ntry.bx_tx_cd.prtry.issr = self.rows[2].b.to_string();
+            ntry.bk_tx_cd.prtry.cd = row.q.to_string();
+            ntry.bk_tx_cd.prtry.issr = self.rows[2].b.to_string();
             ntry.acct_svcr_ref = row.o.to_string();
             ntry_det.refs.end_to_end_id ="1".to_string();
             let debit_detals: Vec<&str> = row.e.split("\n").collect();
@@ -166,14 +166,14 @@ impl DocumentCsv {
                 ntry_det.rltd_pties.cdtr_acct.other.id = debit_detals[0].to_string();
             }
             DocumentCsv::extract_crd_agent(&row.r, & mut ntry_det);
-            ntry_det.rmt_inf.ustrd = row.u.to_string();
-            ntry.ntry_dtls.btch.tx_dtls.push(ntry_det);
+            ntry_det.rmt_inf.ustrd.push(row.u.to_string());
+            ntry.ntry_dtls.tx_dtls.push(ntry_det);
             camt_bk_to_cstm.stmt.ntry.push(ntry);
         }
         let next_row = self.rows.len() - 4; //offset balance data from end document
         let mut balance_opbd = BalanceAttribute::default();
         balance_opbd.amt.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
-        balance_opbd.tp.cd_or_party.cd = "OPDB".to_string();
+        balance_opbd.tp.cd_or_prtry.cd = "OPDB".to_string();
         balance_opbd.amt.amt = self.rows[next_row+1].h.to_string();
         camt_bk_to_cstm.stmt.bal.push(balance_opbd);
         camt_bk_to_cstm.stmt.txs_summry.ttl_dbt_ntries.sum = self.rows[next_row+2].h.to_string();
@@ -181,7 +181,7 @@ impl DocumentCsv {
         camt_bk_to_cstm.stmt.txs_summry.ttl_ntries.nb_of_ntries = self.rows[next_row].l.to_string();
         let mut balance_clbd = BalanceAttribute::default();
         balance_clbd.amt.ccy = camt_bk_to_cstm.stmt.acct.ccy.clone();
-        balance_clbd.tp.cd_or_party.cd = "CLDB".to_string();
+        balance_clbd.tp.cd_or_prtry.cd = "CLDB".to_string();
         balance_clbd.amt.amt = self.rows[next_row+3].l.to_string();
         camt_bk_to_cstm.stmt.bal.push(balance_clbd);
         camt.bk_to_cstmr_stmt.push(camt_bk_to_cstm);
@@ -232,9 +232,9 @@ impl DocumentCsv {
                 if ntry.cdt_dbt_ind == "DBIT"{
                     row.j = ntry.amt.amt.clone();
                 }
-                row.q = ntry.bx_tx_cd.prtry.cd.clone();
+                row.q = ntry.bk_tx_cd.prtry.cd.clone();
                 row.o = ntry.acct_svcr_ref.clone();
-                if let Some(ntry_det) = ntry.ntry_dtls.btch.tx_dtls.get(0)
+                if let Some(ntry_det) = ntry.ntry_dtls.tx_dtls.get(0)
                 {
                     row.e = format!("{}\n{}\n{}",
                                     ntry_det.rltd_pties.dbtr_acct.other.id,
@@ -245,9 +245,14 @@ impl DocumentCsv {
                                     ntry_det.rltd_pties.cdtr.id.othr.id,
                                     ntry_det.rltd_pties.cdtr.nm);
                     row.r = format!("БИК {}, {}",
-                                   ntry_det.rltd_agts.dbtr_agt.bic,
-                                   ntry_det.rltd_agts.dbtr_agt.nm);
-                    row.u = ntry_det.rmt_inf.ustrd.clone();
+                                   ntry_det.rltd_agts.dbtr_agt.fin_instn_id.bic,
+                                   ntry_det.rltd_agts.dbtr_agt.fin_instn_id.nm);
+                    let mut ustrd_all = String::new();
+                    for ustrd in ntry_det.rmt_inf.ustrd.clone(){
+                        ustrd_all.push_str(&ustrd);
+                        ustrd_all.push_str(",");
+                    }
+                    row.u = ustrd_all;
                 }
                 csv.rows.push(row);
             }
@@ -262,7 +267,7 @@ impl DocumentCsv {
             row_9.l = doc.stmt.txs_summry.ttl_ntries.nb_of_ntries.clone();
             csv.rows.push(row_9);
             for bal in &doc.stmt.bal{
-                if bal.tp.cd_or_party.cd == "OPDB"{
+                if bal.tp.cd_or_prtry.cd == "OPDB"{
                     let mut row = RowCsv::new();
                     row.b = "Входящий остаток".to_string();
                     row.h = bal.amt.amt.clone();
@@ -273,7 +278,7 @@ impl DocumentCsv {
                     row_10.l = doc.stmt.txs_summry.ttl_cdt_ntries.sum.clone();
                     csv.rows.push(row_10);
                 }
-                if bal.tp.cd_or_party.cd == "CLDB" {
+                if bal.tp.cd_or_prtry.cd == "CLDB" {
                     let mut row = RowCsv::new();
                     row.b = "Исходящий остаток".to_string();
                     row.l = bal.amt.amt.clone();
