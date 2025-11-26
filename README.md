@@ -1,2 +1,8 @@
-# module1-bank-converter
-Bank converter library rust (yandex practicum rust)
+# bank-converter
+Rust библиотека для конвертации банковских данных 
+Поддержка форматов:
+* CAMT053
+* MT940
+* CSV
+
+Домашняя работа модуль 1
