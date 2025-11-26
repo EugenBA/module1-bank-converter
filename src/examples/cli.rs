@@ -91,7 +91,7 @@ fn main() {
     // Получаем аргументы командной строки
     let mut args: Vec<String> = env::args().collect();
     // Если аргументов недостаточно, показываем справку
-    if args.len() < 1 {
+    if args.len() < 2 {
         eprintln!("Использование:");
         eprintln!("  -i <file name>");
         eprintln!("  -o <file name>");
