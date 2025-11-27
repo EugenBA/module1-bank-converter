@@ -23,8 +23,8 @@ enum Document{
 }
 
 struct PipelineConverter{
-    pub data_in: FormatType,
-    pub data_out: FormatType
+     data_in: FormatType,
+     data_out: FormatType
 }
 
 
